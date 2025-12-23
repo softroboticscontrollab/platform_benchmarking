@@ -1,0 +1,18 @@
+function [M_inv, bolddotx] = dynamics_soft(x, c, u)  
+    q = x(1:2);
+    q_dot = x(3:4);
+
+    % Now using numeric versions
+    M = get_M_comp(q(1), q(2), c.l1, c.l2, c.m2, c.m6);
+    C = get_C_comp(q(1), q(2), q_dot(1), q_dot(2), c.l1, c.l2, c.m6);
+
+    % Damping and stiffness
+    D = diag(c.damping*ones(1, 2));
+    K = diag([c.k1 c.k2]);
+
+    % Dynamics
+    q_ddot = M \ (u - C * q_dot - D * q_dot - K * q);
+
+    M_inv = inv(M);  % Optional, just for debugging
+    bolddotx = [q_dot; q_ddot];
+end
