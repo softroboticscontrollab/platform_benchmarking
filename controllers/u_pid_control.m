@@ -1,4 +1,5 @@
 function u = u_pid_control(q, dq, q_des, dt, c)
+
 % u_pid_control  Joint-space PID (2-DOF) with angle wrapping & anti-windup.
 %   q     : [2x1] current joint angles (rad)
 %   dq    : [2x1] current joint velocities (rad/s)
