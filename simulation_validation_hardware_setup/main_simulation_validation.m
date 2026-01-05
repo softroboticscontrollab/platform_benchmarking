@@ -13,7 +13,7 @@ addpath(genpath('../../polyhedron_constraints'));
 disp('Running simulation with PID Controller...');
 
 %% Simulation parameters
-tmax = 50; dt = 0.00001;
+tmax = 20; dt = 0.00001;
 
 n = round(tmax/dt);
 
@@ -25,12 +25,18 @@ k1 = 69.48618; k2 = 89.03760;
 l1 = 0.122; l2 = 0.122;
 g = 9.81; tol = 1e4;
 F_max = 0.16; k_env = 11.16;
-aE = 0.2; bE = 0.2; gam = 0.2;                                                                                                                    
+aE = 0.2; bE = 0.2; gam = 0.2;  
+p_des = [deg2rad(45); deg2rad(45)];  
+Kp = [10; 10]; Ki = [10; 10]; Kd = [1; 1];  
+
 
 c.m2 = m2; c.m6 = m6; c.damping = damping;
 c.k1 = k1; c.k2 = k2; c.g = g; c.tol = tol;
 c.l1 = l1; c.l2 = l2; c.k_env = k_env;
 c.F_max = F_max; c.aE = aE; c.bE = bE; c.gam = gam;
+c.p_des = p_des; c.dt = dt; c.Kp = Kp; c.Ki = Ki;
+c.Kd = Kd; 
+
 
 %% Initial conditions
 theta1_0 = 0.01; 
@@ -45,13 +51,13 @@ t_vec_sim = 0:dt:tmax;
 %% Initialize control input
 u_t = [0; 0];
 u_traj = zeros(2, n); 
-q_des = [deg2rad(30); deg2rad(30)];   
+% q_des = [deg2rad(30); deg2rad(30)];   
 % p_des = [0.2; 0.15];  
 
-%% PID gains 
-c.Kp = diag([100, 100]);    
-c.Ki = diag([10, 10]);  
-c.Kd = diag([10, 10]); 
+% %% PID gains 
+% c.Kp = diag([100, 100]);    
+% c.Ki = diag([10, 10]);  
+% c.Kd = diag([10, 10]); 
 
 
 %% Simulate
@@ -63,7 +69,8 @@ for t = 1:n
         disp(string(t*dt));
     end
 
-    u_t = u_pid_control(x_traj(1:2,t), x_traj(3:4,t), q_des, dt, c);
+    % u_t = u_pid_control(x_traj(1:2,t), x_traj(3:4,t), q_des, dt, c);
+    u_t = u_pid_control(x_traj(:,t), c);
 
     u_traj(:, t) = u_t;
     [~, bolddotx_t] = dynamics_soft(x_traj(:,t), c, u_t);
@@ -118,40 +125,40 @@ V = [0.35, 0.0322;
 %% Plot
 Soft_CBF_plotting(x_traj(1 :2, :), [l1, l2], H, h, F_max, k_env, dt);
 
-function u = u_pid_control(q, dq, q_des, dt, c)
-
-    if ~isfield(c,'Kp'),    c.Kp   = diag([50, 50]);   end
-    if ~isfield(c,'Ki'),    c.Ki   = diag([0.5, 0.5]); end
-    if ~isfield(c,'Kd'),    c.Kd   = diag([1.0, 1.0]); end
-    if ~isfield(c,'I_max'), c.I_max = [10; 10];        end
-
-    q = q(:); dq = dq(:); q_des = q_des(:);
-
-    e = atan2( sin(q_des - q), cos(q_des - q) );
-
-    persistent e_int
-    if isempty(e_int), e_int = zeros(2,1); end
-
-    e_int = e_int + e * dt;
-    e_int = max(min(e_int, c.I_max), -c.I_max);
-
-    u_unsat = c.Kp*e + c.Ki*e_int - c.Kd*dq;
-
-    have_limits = isfield(c,'u_min') && isfield(c,'u_max');
-    if have_limits
-        u = min(max(u_unsat, c.u_min), c.u_max);
-
-        sat = (u ~= u_unsat);
-        if any(sat)
-            Ki_e = c.Ki*e;
-            same_dir = (sign(u_unsat) == sign(Ki_e));   % integral pushing into the stop
-            stop = sat & same_dir;
-            if any(stop)
-                e_int(stop) = e_int(stop) - e(stop)*dt; % undo last integration step
-            end
-            u = min(max(c.Kp*e + c.Ki*e_int - c.Kd*dq, c.u_min), c.u_max);
-        end
-    else
-        u = u_unsat;
-    end
-end
+% function u = u_pid_control(q, dq, q_des, dt, c)
+% 
+%     if ~isfield(c,'Kp'),    c.Kp   = diag([50, 50]);   end
+%     if ~isfield(c,'Ki'),    c.Ki   = diag([0.5, 0.5]); end
+%     if ~isfield(c,'Kd'),    c.Kd   = diag([1.0, 1.0]); end
+%     if ~isfield(c,'I_max'), c.I_max = [10; 10];        end
+% 
+%     q = q(:); dq = dq(:); q_des = q_des(:);
+% 
+%     e = atan2( sin(q_des - q), cos(q_des - q) );
+% 
+%     persistent e_int
+%     if isempty(e_int), e_int = zeros(2,1); end
+% 
+%     e_int = e_int + e * dt;
+%     e_int = max(min(e_int, c.I_max), -c.I_max);
+% 
+%     u_unsat = c.Kp*e + c.Ki*e_int - c.Kd*dq;
+% 
+%     have_limits = isfield(c,'u_min') && isfield(c,'u_max');
+%     if have_limits
+%         u = min(max(u_unsat, c.u_min), c.u_max);
+% 
+%         sat = (u ~= u_unsat);
+%         if any(sat)
+%             Ki_e = c.Ki*e;
+%             same_dir = (sign(u_unsat) == sign(Ki_e));   % integral pushing into the stop
+%             stop = sat & same_dir;
+%             if any(stop)
+%                 e_int(stop) = e_int(stop) - e(stop)*dt; % undo last integration step
+%             end
+%             u = min(max(c.Kp*e + c.Ki*e_int - c.Kd*dq, c.u_min), c.u_max);
+%         end
+%     else
+%         u = u_unsat;
+%     end
+% end

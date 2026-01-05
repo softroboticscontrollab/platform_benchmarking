@@ -1,0 +1,46 @@
+function u_pid = u_pid_control(x, c, t)
+    x  = x(:);
+    q  = x(1:2);
+    dq = x(3:4);
+
+    persistent t_prev
+    if isempty(t_prev), t_prev = t; end
+    dt = t - t_prev;
+    t_prev = t;
+
+    % PID gains
+    Kp = [100; 100];
+    Ki = [2; 2];
+    Kd = [50; 50];
+
+    persistent int_e
+    if isempty(int_e), int_e = [0; 0]; end
+
+    p = forward_kinematics(q, c);
+    p_des = c.p_des(:);
+
+    e = p_des - p;
+    int_e = int_e + e * dt;
+
+    de = -jacobian(q, c) * dq;
+
+    u_pid = Kp .* e + Ki .* int_e + Kd .* de;
+
+    u_max = [200; 100];
+    u_pid = max(min(u_pid, u_max), -u_max);
+end
+
+
+function p = forward_kinematics(q, c)
+    % Extract parameters
+    l1 = c.l1;
+    l2 = c.l2;
+    
+    % Compute end-effector position using forward kinematics
+
+    x = l2 * ((cos(q(1)) * sin(q(2)) + sin(q(1)) * cos(q(2)) - sin(q(1)) / q(2)) + l1 * (sin(q(1)) / q(1)));
+    y = l2 * (sin(q(1)) * sin(q(2) - cos(q(1)) * cos(q(2)) + cos(q(1)) / q(2)) + l1 * ((1 - cos(q(1))) / q(1)));
+    
+    p = [x; y];
+end
+

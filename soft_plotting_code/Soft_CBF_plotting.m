@@ -43,7 +43,7 @@ function Soft_CBF_plotting(seq_q, L, H, h, F_max, k_env, dt)
     seq_length = size(seq_q, 2);
     f = waitbar(0, 'Running for the cc robot arm trajectory...');
     % for i = 1:int64(1/dt):seq_length
-    for i = 1:1000:seq_length
+    for i = 1:1000000:seq_length
         waitbar(double(i)/seq_length, f, strcat('Running for timestep i in cc robot arm trajectory... i = ', sprintf('%d', i), '/', string(length(seq_q))));
         cla;
         plot(P1, 'color', 'w', 'EdgeColor', 'w');
