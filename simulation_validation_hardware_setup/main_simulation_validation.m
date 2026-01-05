@@ -34,7 +34,7 @@ c.m2 = m2; c.m6 = m6; c.damping = damping;
 c.k1 = k1; c.k2 = k2; c.g = g; c.tol = tol;
 c.l1 = l1; c.l2 = l2; c.k_env = k_env;
 c.F_max = F_max; c.aE = aE; c.bE = bE; c.gam = gam;
-c.p_des = p_des; c.dt = dt; c.Kp = Kp; c.Ki = Ki;
+c.p_des = p_des; c.Kp = Kp; c.Ki = Ki;
 c.Kd = Kd; 
 
 
@@ -63,22 +63,24 @@ u_traj = zeros(2, n);
 %% Simulate
 times = zeros(1, n);
 disp('Simulation time (seconds):')
-for t = 1:n
+for k = 1:n
     
-    if mod(t, 1/dt) == 0
-        disp(string(t*dt));
+    if mod(k, 1/dt) == 0
+        disp(string(k*dt));
     end
 
+    t = (k-1)*dt; 
+
     % u_t = u_pid_control(x_traj(1:2,t), x_traj(3:4,t), q_des, dt, c);
-    u_t = u_pid_control(x_traj(:,t), c);
+    u_t = u_pid_control(x_traj(:,k), c, t);
 
-    u_traj(:, t) = u_t;
-    [~, bolddotx_t] = dynamics_soft(x_traj(:,t), c, u_t);
-    x_traj(:,t+1) = x_traj(:,t) + dt * bolddotx_t;
+    u_traj(:, k) = u_t;
+    [~, bolddotx_t] = dynamics_soft(x_traj(:,k), c, u_t);
+    x_traj(:,k+1) = x_traj(:,k) + dt * bolddotx_t;
 
-    if any(abs(x_traj(:,t+1)) > tol)
-        warning("Simulation unstable at t = %.4f sec", t*dt);
-        x_traj = x_traj(:,1:t);
+    if any(abs(x_traj(:,k+1)) > tol)
+        warning("Simulation unstable at t = %.4f sec", k*dt);
+        x_traj = x_traj(:,1:k);
         break;
     end
 end
