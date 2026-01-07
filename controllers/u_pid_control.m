@@ -20,19 +20,21 @@ dt = t - t_prev;     % elapsed time
 t_prev = t;          % store for next call
 
 
-persistent e_int
-if isempty(e_int)
-    e_int = zeros(2,1);
-end
+% persistent e_int
+% if isempty(e_int)
+%     e_int = zeros(2,1);
+% end
 
 
 e = c.p_des - q;
 
-e_int = e_int + e * dt;
+% e_int = e_int + e * dt;
 
 de = -dq;
 
-u = c.Kp .* e + c.Ki .* e_int + c.Kd .* de;
+% u = c.Kp .* e + c.Ki .* e_int + c.Kd .* de;
+
+u = c.Kp .* e + c.Kd .* de;
 
 end
 

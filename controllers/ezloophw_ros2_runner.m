@@ -156,7 +156,8 @@ c.bE = bE;
 c.gam = gam;
 
 %% PID Controller Setups 
-Kp = [10; 10]; Ki = [10; 10]; Kd = [1; 1];  
+% Ki = [10; 10]
+Kp = [10; 10]; Kd = [1; 1];  
 c.p_des = p_des; c.Kp = Kp; c.Ki = Ki;
 c.Kd = Kd;  
 
