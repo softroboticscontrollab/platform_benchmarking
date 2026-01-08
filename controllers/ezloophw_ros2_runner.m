@@ -149,6 +149,7 @@ k_env = 11.16;
 aE = 0.1; bE = 0.1; gam = 0.1;
 p_des = [deg2rad(45); deg2rad(45)];  
 
+
 c.k_env = k_env;
 c.F_max = F_max;
 c.aE = aE;
@@ -156,9 +157,10 @@ c.bE = bE;
 c.gam = gam;
 
 %% PID Controller Setups 
-% Ki = [10; 10]
-Kp = [10; 10]; Kd = [1; 1];  
-c.p_des = p_des; c.Kp = Kp; c.Ki = Ki;
+% Ki = [10; 10]; Kd = [1;1]; Kp = [10;10];
+Kp = [100; 100]; Kd = [0; 0];  
+c.p_des = p_des; c.Kp = Kp; 
+%c.Ki = Ki;
 c.Kd = Kd;  
 
 %%
