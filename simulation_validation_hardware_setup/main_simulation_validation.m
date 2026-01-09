@@ -19,23 +19,21 @@ n = round(tmax/dt);
 
 % Dynamics parameters
 m2 = 0.13; m6 = 0.13;
-damping = 3.5;      
-% damping = 5.0;      
-k1 = 69.48618; k2 = 89.03760;
+k1 = 147.55762; k2 = 253.56177;
+damping = 5.0; 
 l1 = 0.122; l2 = 0.122;
 g = 9.81; tol = 1e4;
 F_max = 0.16; k_env = 11.16;
 aE = 0.2; bE = 0.2; gam = 0.2;  
-p_des = [deg2rad(45); deg2rad(45)];  
-Kp = [10; 10]; Ki = [10; 10]; Kd = [1; 1];  
+p_des = [deg2rad(30); deg2rad(30)];  
+Kp = [10;10]; Kd = [1;1];  
 
 
 c.m2 = m2; c.m6 = m6; c.damping = damping;
 c.k1 = k1; c.k2 = k2; c.g = g; c.tol = tol;
 c.l1 = l1; c.l2 = l2; c.k_env = k_env;
 c.F_max = F_max; c.aE = aE; c.bE = bE; c.gam = gam;
-c.p_des = p_des; c.Kp = Kp; c.Ki = Ki;
-c.Kd = Kd; 
+c.p_des = p_des; c.Kp = Kp; c.Kd = Kd; 
 
 
 %% Initial conditions

@@ -157,10 +157,8 @@ c.bE = bE;
 c.gam = gam;
 
 %% PID Controller Setups 
-% Ki = [10; 10]; Kd = [1;1]; Kp = [10;10];
-Kp = [100; 100]; Kd = [0; 0];  
+Kp = [10; 10]; Kd = [1; 1];  
 c.p_des = p_des; c.Kp = Kp; 
-%c.Ki = Ki;
 c.Kd = Kd;  
 
 %%
@@ -168,8 +166,7 @@ c.Kd = Kd;
 % which controller to choose. This is the combined controller, both nom and
 % safe supervisor.
 
-% ctrlr = @u_softcbf_combined;
-ctrlr = @u_pid_control;
+ctrlr = @u_pd_control;
 
 %% Initialize ROS2 nodes for the MATLAB side
 % we are this node for sending control commands

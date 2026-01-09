@@ -1,4 +1,4 @@
-function u = u_pid_control(x, c, t)
+function u = u_pd_control(x, c, t)
 % Simple PID controller for a 2-DOF soft manipulator
 %
 % Inputs:
@@ -11,26 +11,11 @@ function u = u_pid_control(x, c, t)
 q  = x(1:2);
 dq = x(3:4);
 
-persistent t_prev
-if isempty(t_prev)
-    t_prev = t;      % first call
-end
-
-dt = t - t_prev;     % elapsed time
-t_prev = t;          % store for next call
-
-
-persistent e_int
-if isempty(e_int)
-    e_int = zeros(2,1);
-end
-
 e = c.p_des - q;
-
-e_int = e_int + e * dt;
 
 de = -dq;
 
-u = c.Kp .* e + c.Ki .* e_int + c.Kd .* de;
+u = diag([c.k1, c.k2])*c.p_des + c.Kp .* e + c.Kd .* de;
 
 end
+
