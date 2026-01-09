@@ -25,7 +25,6 @@ t_prev = t;          % store for next call
 %     e_int = zeros(2,1);
 % end
 
-
 e = c.p_des - q;
 
 % e_int = e_int + e * dt;
