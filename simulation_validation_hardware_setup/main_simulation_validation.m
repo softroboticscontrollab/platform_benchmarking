@@ -27,13 +27,14 @@ F_max = 0.16; k_env = 11.16;
 aE = 0.2; bE = 0.2; gam = 0.2;  
 p_des = [deg2rad(30); deg2rad(30)];  
 Kp = [10;10]; Kd = [1;1];  
-
+Kp_ct = [10;10]; Kd_ct = [1;1];
 
 c.m2 = m2; c.m6 = m6; c.damping = damping;
 c.k1 = k1; c.k2 = k2; c.g = g; c.tol = tol;
 c.l1 = l1; c.l2 = l2; c.k_env = k_env;
 c.F_max = F_max; c.aE = aE; c.bE = bE; c.gam = gam;
 c.p_des = p_des; c.Kp = Kp; c.Kd = Kd; 
+c.Kp_ct = Kp_ct; c.Kd_ct = Kd_ct; 
 
 
 %% Initial conditions
@@ -52,11 +53,6 @@ u_traj = zeros(2, n);
 % q_des = [deg2rad(30); deg2rad(30)];   
 % p_des = [0.2; 0.15];  
 
-% %% PID gains 
-% c.Kp = diag([100, 100]);    
-% c.Ki = diag([10, 10]);  
-% c.Kd = diag([10, 10]); 
-
 
 %% Simulate
 times = zeros(1, n);
@@ -70,7 +66,8 @@ for k = 1:n
     t = (k-1)*dt; 
 
     % u_t = u_pid_control(x_traj(1:2,t), x_traj(3:4,t), q_des, dt, c);
-    u_t = u_pid_control(x_traj(:,k), c, t);
+    % u_t = u_pd_control(x_traj(:,k), c, t);
+    u_t = u_computed_torque_control(x_traj(:,k), c, t);
 
     u_traj(:, k) = u_t;
     [~, bolddotx_t] = dynamics_soft(x_traj(:,k), c, u_t);
@@ -82,10 +79,6 @@ for k = 1:n
         break;
     end
 end
-
-% disp(u_traj)
-% avg_time = mean(times);
-% disp(avg_time)
 
 %% Downsample for plotting at 100 Hz
 plot_freq = 10;                  % Hz

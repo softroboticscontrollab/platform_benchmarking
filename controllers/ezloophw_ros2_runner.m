@@ -149,7 +149,6 @@ k_env = 11.16;
 aE = 0.1; bE = 0.1; gam = 0.1;
 p_des = [deg2rad(45); deg2rad(45)];  
 
-
 c.k_env = k_env;
 c.F_max = F_max;
 c.aE = aE;
@@ -157,16 +156,17 @@ c.bE = bE;
 c.gam = gam;
 
 %% PID Controller Setups 
-Kp = [10; 10]; Kd = [1; 1];  
+Kp = [10; 10]; Kd = [1; 1]; 
+Kp_ct = [10;10]; Kd_ct = [1;1];
 c.p_des = p_des; c.Kp = Kp; 
-c.Kd = Kd;  
+c.Kd = Kd; c.Kp_ct = Kp_ct; 
+c.Kd_ct = Kd_ct; 
 
 %%
-
 % which controller to choose. This is the combined controller, both nom and
 % safe supervisor.
 
-ctrlr = @u_pd_control;
+ctrlr = @u_computed_torque_control;
 
 %% Initialize ROS2 nodes for the MATLAB side
 % we are this node for sending control commands
