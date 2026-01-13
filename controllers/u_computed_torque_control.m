@@ -6,21 +6,17 @@ function u = u_computed_torque_control(x, c, t)
     q  = x(1:2);
     dq = x(3:4);
 
-    % Desired trajectory (sinusoidal by default)
     [qd, dqd, ddqd] = desired_traj_sine(t, c);
 
-    % Tracking errors (wrap for angles if you want; here standard)
     e  = qd - q;
     de = dqd - dq;
 
     % Model terms
     [M, C] = M_C_Computation(x, c); 
 
-    % Soft “joint-space” stiffness and damping terms (your params)
     K = diag([c.k1, c.k2]);
     D = c.damping * eye(2);
 
-    % Computed-torque / inverse dynamics law
     y = ddqd + c.Kp_ct.*e + c.Kd_ct.*de;          
     u = M*y + C*dq + K*q + D*dq;
 
@@ -29,7 +25,6 @@ end
 
 function [qd, dqd, ddqd] = desired_traj_sine(t, c)
 % Sinusoidal desired joint trajectory around c.p_des.
-% You can tune amplitudes/frequencies here.
 
     q0 = [0; 0];
 
