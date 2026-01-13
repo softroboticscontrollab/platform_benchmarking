@@ -6,7 +6,7 @@ function u = u_computed_torque_control(x, c, t)
     q  = x(1:2);
     dq = x(3:4);
 
-    [qd, dqd, ddqd] = desired_traj_sine(t, c);
+    [qd, dqd, ddqd] = desired_traj_sine(x, t);
 
     e  = qd - q;
     de = dqd - dq;
@@ -23,7 +23,7 @@ function u = u_computed_torque_control(x, c, t)
 end
 
 
-function [qd, dqd, ddqd] = desired_traj_sine(t, c)
+function [qd, dqd, ddqd] = desired_traj_sine(x, t)
 % Sinusoidal desired joint trajectory around c.p_des.
 
     q0 = x(1:2,1);
