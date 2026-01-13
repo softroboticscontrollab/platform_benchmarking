@@ -26,7 +26,7 @@ end
 function [qd, dqd, ddqd] = desired_traj_sine(t, c)
 % Sinusoidal desired joint trajectory around c.p_des.
 
-    q0 = [0; 0];
+    q0 = [0.001; 0.001];
 
     % amplitude (rad) and frequency (Hz)
     A = deg2rad([60; 60]);      % 10 deg amplitude on each joint
