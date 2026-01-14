@@ -4,9 +4,8 @@ function u = u_computed_torque_control(x, c, t)
 % Uses desired trajectory qd(t), dqd(t), ddqd(t)
 
     q  = x(1:2);
-    % if any(abs(qd) < 1e-6
-    %     qd = 1e-4;
-    % end
+    q(q > 0 & q < 1e-8) = 1e-4;
+    q(q < 0 & q > -1e-8) = -1e-4;
     dq = x(3:4);
 
     [qd, dqd, ddqd] = desired_traj_sine(x,c, t);
@@ -44,15 +43,16 @@ function [qd, dqd, ddqd] = desired_traj_sine(x, c, t)
     % ddqd = -A .* (w.^2) .* sin(w*t);
 
     q_bias = [0.01;0.01];          
-    A = deg2rad([10; 10]); 
+    A = deg2rad([40; 40]); 
 
-    A = min(A, 0.8*abs(q_bias));
+    % A = min(A, 0.8*abs(q_bias));
 
     qd = q_bias + A .* sin(w*t);
-    % if abs(qd) < 1e-6
-    %     qd = 1e-4;
-    % end
+    qd(qd> 0 & qd < 1e-8) = 1e-4;
+    qd(qd < 0 & qd > -1e-8) = -1e-4;
+
     dqd = A .* w .* cos(w*t);
     ddqd = -A .* (w.^2) .* sin(w*t);
 
 end
+

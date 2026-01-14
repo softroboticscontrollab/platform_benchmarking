@@ -4,16 +4,18 @@ function u = u_computed_torque_control(x, c, t)
 % Uses desired trajectory qd(t), dqd(t), ddqd(t)
 
     q  = x(1:2);
-
+    q(q > 0 & q < 1e-8) = 1e-4;
+    q(q < 0 & q > -1e-8) = -1e-4;
     dq = x(3:4);
+    x_new = [q;dq];
 
-    [qd, dqd, ddqd] = desired_traj_sine(x,c, t);
+    [qd, dqd, ddqd] = desired_traj_sine(x_new,c, t);
 
     e  = qd - q;
     de = dqd - dq;
 
     % Model terms
-    [M, C] = M_C_Computation(x, c); 
+    [M, C] = M_C_Computation(x_new, c); 
 
     K = diag([c.k1, c.k2]);
     D = c.damping * eye(2);
@@ -41,76 +43,18 @@ function [qd, dqd, ddqd] = desired_traj_sine(x, c, t)
     % dqd  = A .* (w) .* cos(w*t);
     % ddqd = -A .* (w.^2) .* sin(w*t);
 
-    q_bias = [0.01;0.01];          
-    A = deg2rad([40; 40]); 
+    q_bias = deg2rad([30; 30]);         
+    A = deg2rad([10; 10]); 
 
-    A = min(A, 0.8*abs(q_bias));
-    
+    % A = min(A, 0.8*abs(q_bias));
+
     qd = q_bias + A .* sin(w*t);
+    eps_q = 1e-6; 
+    if any(abs(qd) < eps_q)
+        disp("qd is near zero (possible singular region)");
+    end
     dqd = A .* w .* cos(w*t);
     ddqd = -A .* (w.^2) .* sin(w*t);
 
 end
 
-
-
-
-
-% function u = u_computed_torque_control(x, c, t)
-% % Computed torque controller for 2-DOF planar arm/soft-joint model
-% % State x = [q1;q2;dq1;dq2]
-% % Uses desired trajectory qd(t), dqd(t), ddqd(t)
-% 
-%     q  = x(1:2);
-%     q(q > 0 & q < 1e-4) = 1e-4;
-%     q(q < 0 & q > -1e-4) = -1e-4;
-%     dq = x(3:4);
-% 
-%     [qd, dqd, ddqd] = desired_traj_sine(x,c, t);
-% 
-%     e  = qd - q;
-%     de = dqd - dq;
-% 
-%     % Model terms
-%     [M, C] = M_C_Computation(x, c); 
-% 
-%     K = diag([c.k1, c.k2]);
-%     D = c.damping * eye(2);
-% 
-%     y = ddqd + c.Kp_ct.*e + c.Kd_ct.*de;    
-%     % y = ddqd + c.Kp_ct.*qd + c.Kd_ct.*dqd - c.Kp_ct.*q - c.Kd_ct.*dq;  
-%     u = M*y + C*dq + K*q + D*dq;
-% 
-% end
-% 
-% 
-% function [qd, dqd, ddqd] = desired_traj_sine(x, c, t)
-% % Sinusoidal desired joint trajectory around c.p_des.
-% 
-%     % q0 = c.p_des(:);
-%     % % q0 = [0;0];
-%     % 
-%     % % amplitude (rad) and frequency (Hz)
-%     % A = deg2rad([20; 20]);      % 10 deg amplitude on each joint
-%     f = [0.2; 0.2];            % Hz
-%     w = 2*pi*f;
-%     % 
-%     % % qd   = q0 + A .* sin(w*t);
-%     % qd   = 0.001 + A .* sin(w*t);
-%     % dqd  = A .* (w) .* cos(w*t);
-%     % ddqd = -A .* (w.^2) .* sin(w*t);
-% 
-%     q_bias = [0.01;0.01];          
-%     A = deg2rad([40; 40]); 
-% 
-%     % A = min(A, 0.8*abs(q_bias));
-% 
-%     qd = q_bias + A .* sin(w*t);
-%     qd(qd> 0 & qd < 1e-4) = 1e-4;
-%     qd(qd < 0 & qd > -1e-4) = -1e-4;
-% 
-%     dqd = A .* w .* cos(w*t);
-%     ddqd = -A .* (w.^2) .* sin(w*t);
-% 
-% end
-% 
