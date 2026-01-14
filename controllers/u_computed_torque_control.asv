@@ -7,14 +7,15 @@ function u = u_computed_torque_control(x, c, t)
     q(q > 0 & q < 1e-8) = 1e-4;
     q(q < 0 & q > -1e-8) = -1e-4;
     dq = x(3:4);
+    x_new = [q;dq];
 
-    [qd, dqd, ddqd] = desired_traj_sine(x,c, t);
+    [qd, dqd, ddqd] = desired_traj_sine(x_new,c, t);
 
     e  = qd - q;
     de = dqd - dq;
 
     % Model terms
-    [M, C] = M_C_Computation(x, c); 
+    [M, C] = M_C_Computation(x_new, c); 
 
     K = diag([c.k1, c.k2]);
     D = c.damping * eye(2);
@@ -42,15 +43,17 @@ function [qd, dqd, ddqd] = desired_traj_sine(x, c, t)
     % dqd  = A .* (w) .* cos(w*t);
     % ddqd = -A .* (w.^2) .* sin(w*t);
 
-    q_bias = [0.01;0.01];          
-    A = deg2rad([40; 40]); 
+    q_bias = deg2rad([5; 5]);         
+    A = deg2rad([50; 50]); 
 
-    % A = min(A, 0.8*abs(q_bias));
+    A = min(A, 0.8*abs(q_bias));
 
     qd = q_bias + A .* sin(w*t);
-    qd(qd> 0 & qd < 1e-8) = 1e-4;
-    qd(qd < 0 & qd > -1e-8) = -1e-4;
-
+    eps_q = 1e-6; 
+    if any(abs(qd) < eps_q)
+        disp("qd is near zero (possible singular region)");
+        qd = 1e-3;
+    end
     dqd = A .* w .* cos(w*t);
     ddqd = -A .* (w.^2) .* sin(w*t);
 

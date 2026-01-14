@@ -43,15 +43,16 @@ function [qd, dqd, ddqd] = desired_traj_sine(x, c, t)
     % dqd  = A .* (w) .* cos(w*t);
     % ddqd = -A .* (w.^2) .* sin(w*t);
 
-    q_bias = deg2rad([30; 30]);         
-    A = deg2rad([10; 10]); 
+    q_bias = deg2rad([5; 5]);         
+    A = deg2rad([50; 50]); 
 
-    % A = min(A, 0.8*abs(q_bias));
+    A = min(A, 0.8*abs(q_bias));
 
     qd = q_bias + A .* sin(w*t);
     eps_q = 1e-6; 
     if any(abs(qd) < eps_q)
         disp("qd is near zero (possible singular region)");
+        qd = 1e-3;
     end
     dqd = A .* w .* cos(w*t);
     ddqd = -A .* (w.^2) .* sin(w*t);
