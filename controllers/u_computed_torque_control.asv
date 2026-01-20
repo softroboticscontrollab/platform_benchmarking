@@ -4,8 +4,6 @@ function u = u_computed_torque_control(x, c, t)
 % Uses desired trajectory qd(t), dqd(t), ddqd(t)
 
     q  = x(1:2);
-    q(q > 0 & q < 1e-8) = 1e-4;
-    q(q < 0 & q > -1e-8) = -1e-4;
     dq = x(3:4);
     x_new = [q;dq];
 
@@ -29,19 +27,8 @@ end
 
 function [qd, dqd, ddqd] = desired_traj_sine(x, c, t)
 % Sinusoidal desired joint trajectory around c.p_des.
-
-    % q0 = c.p_des(:);
-    % % q0 = [0;0];
-    % 
-    % % amplitude (rad) and frequency (Hz)
-    % A = deg2rad([20; 20]);      % 10 deg amplitude on each joint
-    f = [0.2; 0.2];            % Hz
+    f = [0.2; 0.2];           
     w = 2*pi*f;
-    % 
-    % % qd   = q0 + A .* sin(w*t);
-    % qd   = 0.001 + A .* sin(w*t);
-    % dqd  = A .* (w) .* cos(w*t);
-    % ddqd = -A .* (w.^2) .* sin(w*t);
 
     q_bias = deg2rad([5; 5]);         
     A = deg2rad([50; 50]); 

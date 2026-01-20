@@ -13,7 +13,7 @@ addpath(genpath('../../polyhedron_constraints'));
 disp('Running simulation with PID Controller...');
 
 %% Simulation parameters
-tmax = 20; dt = 0.00001;
+tmax = 45; dt = 0.00001;
 
 n = round(tmax/dt);
 
@@ -116,7 +116,7 @@ V = [0.35, 0.0322;
 [H, h] = computeSafetyConstraints(V);
 
 %% Plot
-% Soft_CBF_plotting(x_traj(1 :2, :), [l1, l2], H, h, F_max, k_env, dt);
+Soft_CBF_plotting(x_traj(1 :2, :), [l1, l2], H, h, F_max, k_env, dt);
 
 % function u = u_pid_control(q, dq, q_des, dt, c)
 % 
