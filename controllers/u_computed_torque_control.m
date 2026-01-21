@@ -20,6 +20,7 @@ function u = u_computed_torque_control(x, c, t)
     y = ddqd + c.Kp_ct.*e + c.Kd_ct.*de;    
     % y = ddqd + c.Kp_ct.*qd + c.Kd_ct.*dqd - c.Kp_ct.*q - c.Kd_ct.*dq;  
     u = M*y + C*dq + K*q + D*dq;
+    % u = M*y + C*dq;
 
 end
 

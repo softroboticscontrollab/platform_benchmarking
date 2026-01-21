@@ -13,7 +13,7 @@ addpath(genpath('../../polyhedron_constraints'));
 disp('Running simulation with PID Controller...');
 
 %% Simulation parameters
-tmax = 45; dt = 0.00001;
+tmax = 20; dt = 0.00001;
 
 n = round(tmax/dt);
 
