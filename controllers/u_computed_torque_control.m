@@ -19,9 +19,7 @@ function u = u_computed_torque_control(x, c, t)
 
     y = ddqd + c.Kp_ct.*e + c.Kd_ct.*de;    
     % y = ddqd + c.Kp_ct.*qd + c.Kd_ct.*dqd - c.Kp_ct.*q - c.Kd_ct.*dq;  
-    % u = M*y + C*dq + K*q + D*dq;
-    u = M*y + C*dq;
-
+    u = M*y + C*dq + K*q + D*dq;
 end
 
 
@@ -82,7 +80,7 @@ function [qd, dqd, ddqd] = desired_traj_sine(t)
 
         time_data = data.("Test time");
         time_data = time_data(:);
-        time_data = time_data - time_data(1);  % align to start at 0
+        time_data = time_data - time_data(1);
 
         q1 = deg2rad(2*data.theta_0(:));
         q2 = deg2rad(2*data.theta_1(:));
