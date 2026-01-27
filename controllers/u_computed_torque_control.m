@@ -12,7 +12,7 @@ function u = u_computed_torque_control(x, c, t)
     de = dqd - dq;
 
     % Model terms
-    [M, C] = M_C_Computation(x, c); 
+    [M, C] = M_C_Computation(x, c);
 
     K = diag([c.k1, c.k2]);
     D = c.damping * eye(2);

@@ -168,6 +168,9 @@ c.Kd_ct = Kd_ct;
 
 ctrlr = @u_computed_torque_control;
 
+%@u_computed_torque_control
+%@u_sim_traj
+
 %% Initialize ROS2 nodes for the MATLAB side
 % we are this node for sending control commands
 matlabPubNodeName = "matlab_cmder";
