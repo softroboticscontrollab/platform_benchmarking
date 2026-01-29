@@ -1,0 +1,66 @@
+%% Example Code for plotting of data 
+clear all; close all; clc;
+
+%% Setup
+% values here are chosen based on physical hardware
+
+% length of limb 1
+l1 = 0.122; 
+% length of limb 2
+l2 = 0.122; 
+epsilon = 1e-6; 
+% calculated spring constant of deformable force plate   
+k = 11.16; 
+% allowable max force on force plate - used for force-critical tasks
+Fmax = 11.16 * 1.6 / 100; 
+
+%% Pulling reference data used for trajectory generation 
+
+RTJ = 'plotting_data/u_ct_ref_trajV2.csv';
+
+RTJ = readtable(RTJ, ...
+    'HeaderLines', 2, 'VariableNamingRule', 'preserve');
+
+time_RTJ     = RTJ.("Test time");
+theta_0_RTJ  = RTJ.theta_0;
+theta_1_RTJ  = RTJ.theta_1;
+
+% Convert angles from degrees to radians
+q0_RTJ  = deg2rad(theta_0_RTJ*2);
+q1_RTJ  = deg2rad(theta_1_RTJ*2);
+
+% Solve for end effector position using forward kinematics
+Tip_x_RTJ = l2 * ((cos(q0_RTJ) .* sin(q1_RTJ) + sin(q0_RTJ) .* cos(q1_RTJ) - sin(q0_RTJ)) ./ q1_RTJ) ...
+    + l1 * (sin(q0_RTJ) ./ q0_RTJ);
+Tip_y_RTJ = l2 * ((sin(q0_RTJ) .* sin(q1_RTJ) - cos(q0_RTJ) .* cos(q1_RTJ) + cos(q0_RTJ)) ./ q1_RTJ) ...
+    + l1 * ((1 - cos(q0_RTJ)) ./ q0_RTJ);
+
+
+subplot(1,2,1); plot(time_RTJ,q0_RTJ);
+title('Raw State Ref Data for q0')
+subplot(1,2,2); plot(time_RTJ,q1_RTJ);
+title('Raw State Ref Data for q1')
+
+%% Pulling data from experiment XXX 
+
+XXX = 'plotting_data/u_ct_ref_trajV2.csv';
+
+XXX = readtable(XXX, ...
+    'HeaderLines', 2, 'VariableNamingRule', 'preserve');
+
+time_XXX     = XXX.("Test time");
+theta_0_XXX  = XXX.theta_0;
+theta_1_XXX  = XXX.theta_1;
+
+Fp0_XXX      = XXX.ForcePlate_0;
+
+% Convert angles from degrees to radians
+q0_XXX  = deg2rad(theta_0_XXX)*2;
+q1_XXX  = deg2rad(theta_1_XXX)*2;
+
+% Solve for end effector position using forward kinematics
+Tip_x_XXX = l2 * ((cos(q0_XXX) .* sin(q1_XXX) + sin(q0_XXX) .* cos(q1_XXX) - sin(q0_XXX)) ./ q1_XXX) ...
+    + l1 * (sin(q0_XXX) ./ q0_XXX);
+Tip_y_XXX = l2 * ((sin(q0_XXX) .* sin(q1_XXX) - cos(q0_XXX) .* cos(q1_XXX) + cos(q0_XXX)) ./ q1_XXX) ...
+    + l1 * ((1 - cos(q0_XXX)) ./ q0_XXX);
+

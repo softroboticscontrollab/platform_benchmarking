@@ -73,7 +73,7 @@ end
 
 function [qd, dqd, ddqd] = desired_traj_sine(t)
     persistent Fq1 Fq2 Fdq1 Fdq2 Fddq1 Fddq2 tmin tmax
-
+% ezloophw_closedloop_ros2_reserv_pneumatics_2026-1-20_153443
     if isempty(Fq1)
         data = readtable('ezloophw_closedloop_ros2_reserv_pneumatics_2026-1-20_153443.csv', ...
         'HeaderLines', 2, 'VariableNamingRule', 'preserve');

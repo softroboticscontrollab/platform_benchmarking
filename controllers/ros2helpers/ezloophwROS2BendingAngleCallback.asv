@@ -32,7 +32,7 @@ function ezloophwROS2BendingAngleCallback(message, handles)
         bendingVec = message.data(:)';  % Row vector
         % Convert to radians
         bendingVec = bendingVec*(pi/180);
-        bendingVec = mod(bendingVec, 2*pi);
+        bendingVec(bendingVec) < 0
         % convert angle from theta to state q
         bendingVec = 2*bendingVec;
         % insert new sample

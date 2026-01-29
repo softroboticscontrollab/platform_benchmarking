@@ -200,8 +200,12 @@ subtopic = 'ezloophw_sensors';
 % ros
 global bendingVec;
 global prevBendingVec; % for velocities finite difference
+global prevdBendingVec; 
 global n_smooth_prev_velocity; % velocity smoothing
 global dBendingVec; % the calculated velocity finite difference
+
+global q_storage; % storing values for debugging 
+global dq_storage; % storing values for debugging
 
 rxCallbackHandles.node = matlabSubNode;
 % for calculating dq/dt
@@ -215,6 +219,10 @@ bendingVec = zeros(1,2);
 n_smooth_prev_velocity = 10;
 prevBendingVec = zeros(n_smooth_prev_velocity, 2); % now storing the last ten samples.
 dBendingVec = zeros(1,2);
+prevdBendingVec = zeros(n_smooth_prev_velocity, 2);
+
+q_storage = zeros(1,2);
+dq_storage = zeros(1,2);
 
 disp('Attempting to start the subscriber...')
 while ~subStarted
