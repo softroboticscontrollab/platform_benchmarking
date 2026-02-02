@@ -18,8 +18,9 @@ function u = u_computed_torque_control(x, c, t)
     D = c.damping * eye(2);
 
     y = ddqd + c.Kp_ct.*e + c.Kd_ct.*de;    
-    % y = ddqd + c.Kp_ct.*qd + c.Kd_ct.*dqd - c.Kp_ct.*q - c.Kd_ct.*dq;  
-    u = M*y + C*dq + K*q + D*dq;
+    % y = ddqd + c.Kp_ct.*qd + c.Kd_ct.*dqd - c.Kp_ct.*q - c.Kd_ct.*dq; 
+
+    u = M*y + C*dqd + K*qd + D*dqd;
 end
 
 
@@ -75,7 +76,7 @@ function [qd, dqd, ddqd] = desired_traj_sine(t)
     persistent Fq1 Fq2 Fdq1 Fdq2 Fddq1 Fddq2 tmin tmax
 % ezloophw_closedloop_ros2_reserv_pneumatics_2026-1-20_153443
     if isempty(Fq1)
-        data = readtable('ezloophw_closedloop_ros2_reserv_pneumatics_2026-1-20_153443.csv', ...
+        data = readtable('sinwave_traj.csv', ...
         'HeaderLines', 2, 'VariableNamingRule', 'preserve');
 
         time_data = data.("Test time");

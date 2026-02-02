@@ -14,7 +14,7 @@ function ezloophwROS2BendingAngleCallback(message, handles)
     global prevBendingVec % now stores previous 10
     global dBendingVec
     global prevRxTime
-    global q_storage
+    global q_storage      
     global dq_storage
 
     % get the time since last message received
@@ -30,11 +30,10 @@ function ezloophwROS2BendingAngleCallback(message, handles)
         a = prevBendingVec;
         prevBendingVec(1:end-1, :) = prevBendingVec(2:end, :);
         bendingVec = message.data(:)';  % Row vector
-        % Convert to radians
-        bendingVec = bendingVec*(pi/180);
-        bendingVec = mod(bendingVec, 2*pi);
         % convert angle from theta to state q
         bendingVec = 2*bendingVec;
+        % Convert to radians
+        bendingVec = bendingVec*(pi/180);
         % insert new sample
         prevBendingVec(end,:) = bendingVec;
         % finite difference
@@ -43,9 +42,9 @@ function ezloophwROS2BendingAngleCallback(message, handles)
         % averaging filter
         
         % average velocity of the last ten
-        dBendingVec = sum(prevBendingVec-a,1)/n_smooth_prev_velocity/dt;
+%         dBendingVec = sum(prevBendingVec-a,1)/n_smooth_prev_velocity/dt;
         % no average velocity, just current velocity
-        % dBendingVec = (prevBendingVec(end,:)- prevBendingVec(end-1,:))/dt;
+        dBendingVec = (prevBendingVec(end,:)- prevBendingVec(end-1,:))/dt;
         % debugging
         dq_storage = [dq_storage; dBendingVec];
         disp("Received " + string(bendingVec) + ", velocities " + string(dBendingVec));

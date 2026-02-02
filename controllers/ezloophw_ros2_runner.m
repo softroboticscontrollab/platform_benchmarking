@@ -157,7 +157,7 @@ c.gam = gam;
 
 %% PID Controller Setups 
 Kp = [10; 10]; Kd = [1; 1]; 
-Kp_ct = [10;10]; Kd_ct = [1;1];
+Kp_ct = [10;10]; Kd_ct = [2;2];
 c.p_des = p_des; c.Kp = Kp; 
 c.Kd = Kd; c.Kp_ct = Kp_ct; 
 c.Kd_ct = Kd_ct; 

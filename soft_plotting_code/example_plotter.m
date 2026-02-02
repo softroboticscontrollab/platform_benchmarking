@@ -16,14 +16,19 @@ Fmax = 11.16 * 1.6 / 100;
 
 %% Pulling reference data used for trajectory generation 
 
-RTJ = 'plotting_data/u_ct_ref_trajV2.csv';
+RTJ = 'plotting_data/sinwave_traj.csv';
 
 RTJ = readtable(RTJ, ...
     'HeaderLines', 2, 'VariableNamingRule', 'preserve');
 
 time_RTJ     = RTJ.("Test time");
+time_RTJ     = time_RTJ(2:end);
 theta_0_RTJ  = RTJ.theta_0;
+theta_0_RTJ  = theta_0_RTJ(2:end);
 theta_1_RTJ  = RTJ.theta_1;
+theta_1_RTJ  = theta_1_RTJ(2:end);
+
+startidx_RTJ = find(RTJ.("u_t(0)"), 1, 'first');
 
 % Convert angles from degrees to radians
 q0_RTJ  = deg2rad(theta_0_RTJ*2);
@@ -35,15 +40,9 @@ Tip_x_RTJ = l2 * ((cos(q0_RTJ) .* sin(q1_RTJ) + sin(q0_RTJ) .* cos(q1_RTJ) - sin
 Tip_y_RTJ = l2 * ((sin(q0_RTJ) .* sin(q1_RTJ) - cos(q0_RTJ) .* cos(q1_RTJ) + cos(q0_RTJ)) ./ q1_RTJ) ...
     + l1 * ((1 - cos(q0_RTJ)) ./ q0_RTJ);
 
-
-subplot(1,2,1); plot(time_RTJ,q0_RTJ);
-title('Raw State Ref Data for q0')
-subplot(1,2,2); plot(time_RTJ,q1_RTJ);
-title('Raw State Ref Data for q1')
-
 %% Pulling data from experiment XXX 
 
-XXX = 'plotting_data/u_ct_ref_trajV2.csv';
+XXX = 'plotting_data/ezloophw_closedloop_ros2_reserv_pneumatics_2026-2-2_160003.csv';
 
 XXX = readtable(XXX, ...
     'HeaderLines', 2, 'VariableNamingRule', 'preserve');
@@ -53,6 +52,10 @@ theta_0_XXX  = XXX.theta_0;
 theta_1_XXX  = XXX.theta_1;
 
 Fp0_XXX      = XXX.ForcePlate_0;
+
+startidx_XXX = find(XXX.("u_t(0)"), 1, 'first');
+
+time_XXX = time_XXX - time_XXX(startidx_XXX);
 
 % Convert angles from degrees to radians
 q0_XXX  = deg2rad(theta_0_XXX)*2;
@@ -64,3 +67,64 @@ Tip_x_XXX = l2 * ((cos(q0_XXX) .* sin(q1_XXX) + sin(q0_XXX) .* cos(q1_XXX) - sin
 Tip_y_XXX = l2 * ((sin(q0_XXX) .* sin(q1_XXX) - cos(q0_XXX) .* cos(q1_XXX) + cos(q0_XXX)) ./ q1_XXX) ...
     + l1 * ((1 - cos(q0_XXX)) ./ q0_XXX);
 
+%% PLotting Time 
+
+figure(1)
+subplot(1,2,1); plot(time_RTJ,q0_RTJ);
+hold on 
+plot(time_XXX(startidx_XXX:end),q0_XXX(startidx_XXX:end))
+title('Raw State Ref Data for q0')
+subplot(1,2,2); plot(time_RTJ,q1_RTJ);
+hold on 
+plot(time_XXX(startidx_XXX:end),q1_XXX(startidx_XXX:end))
+title('Raw State Ref Data for q1')
+
+[dq0, ddq0] = sgolay_derivatives(q0_RTJ, time_RTJ, 241, 3);
+[dq1, ddq1] = sgolay_derivatives(q1_RTJ, time_RTJ, 241, 3);
+
+% figure(2)
+% subplot(1,2,1); plot(time_RTJ,dq0);
+% title('sgolay dq0')
+% subplot(1,2,2); plot(time_RTJ,dq1);
+% title('sgolay dq1')
+% 
+% fdq0  = griddedInterpolant(time_RTJ, dq0,  'linear', 'nearest');
+% fdq1  = griddedInterpolant(time_RTJ, dq1,  'linear', 'nearest');
+% 
+% figure(3)
+% subplot(1,2,1); plot(time_RTJ,fdq0(time_RTJ));
+% title('sgolay fdq0')
+% subplot(1,2,2); plot(time_RTJ,fdq1(time_RTJ));
+% title('sgolay fdq1')
+
+%% Used for solving for velocities and accelerations from reference trajectory 
+
+function [d1, d2] = sgolay_derivatives(y, t, window_length, poly_order)
+        % Computes smoothed first and second derivatives using Savitzky-Golay method
+        half_window = (window_length - 1) / 2;
+        n = length(y);
+        d1 = zeros(size(y));
+        d2 = zeros(size(y));
+
+        for i = 1:n
+            idx = max(1, i - half_window):min(n, i + half_window);
+            ti = t(idx);
+            yi = y(idx);
+
+            t_center = mean(ti);
+            t_norm = ti - t_center;
+            t_scale = max(abs(t_norm));
+            if t_scale == 0
+                t_scale = 1; 
+            end
+            t_norm = t_norm / t_scale;
+
+            p = polyfit(t_norm, yi, poly_order);
+
+            dp = polyder(p);
+            ddp = polyder(dp);
+
+            d1(i) = polyval(dp, 0) / t_scale;
+            d2(i) = polyval(ddp, 0) / (t_scale^2);
+        end
+end
