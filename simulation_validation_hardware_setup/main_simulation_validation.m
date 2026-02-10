@@ -28,6 +28,7 @@ aE = 0.2; bE = 0.2; gam = 0.2;
 p_des = [deg2rad(30); deg2rad(30)];  
 Kp = [10;10]; Kd = [1;1];  
 Kp_ct = [10;10]; Kd_ct = [1;1];
+u_limit = 250;
 
 c.m2 = m2; c.m6 = m6; c.damping = damping;
 c.k1 = k1; c.k2 = k2; c.g = g; c.tol = tol;
@@ -35,6 +36,7 @@ c.l1 = l1; c.l2 = l2; c.k_env = k_env;
 c.F_max = F_max; c.aE = aE; c.bE = bE; c.gam = gam;
 c.p_des = p_des; c.Kp = Kp; c.Kd = Kd; 
 c.Kp_ct = Kp_ct; c.Kd_ct = Kd_ct; 
+c.u_limit = u_limit;
 
 
 %% Initial conditions

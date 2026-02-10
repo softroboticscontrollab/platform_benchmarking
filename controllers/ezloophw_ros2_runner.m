@@ -121,6 +121,7 @@ c.freq1 = 1/per1;
 c.freq2 = 1/per2;
 c.shift1 = 0;
 c.shift2 = 0;
+c.u_limit = 250;
 
 % constants for the CBF-based supervisor
 F_max = 0.16; % shouldn't this be 0.1786? 11.16*1.6/1000

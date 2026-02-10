@@ -1,13 +1,7 @@
 function u = u_computed_torque_control(x, c, t)
-    % Computed torque controller for 2-DOF planar arm/soft-joint model
-    % State x = [q1;q2;dq1;dq2]
-    % Uses desired trajectory qd(t), dqd(t), ddqd(t)
-
-
-    persistent u_prev
-    if isempty(u_prev)
-        u_prev = zeros(2,1);   
-    end
+% Computed torque controller for 2-DOF planar arm/soft-joint model
+% State x = [q1;q2;dq1;dq2]
+% Uses desired trajectory qd(t), dqd(t), ddqd(t)
 
     q  = x(1:2);
     dq = x(3:4);
@@ -24,16 +18,10 @@ function u = u_computed_torque_control(x, c, t)
     D = c.damping * eye(2);
 
     % y = ddqd - c.Kp_ct.*e - c.Kd_ct.*de;   
-    u = M*ddqd + C*dqd + K*qd + D*dqd + c.Kp_ct.*e + c.Kd_ct.*de;
+
+    u = M*ddqd + C*dq + K*qd + D*dqd + c.Kp_ct.*e + c.Kd_ct.*de;
 
     % numerical stability check
-    if isfield(c,'u_limit') && ~isempty(c.u_limit)
-        if any(abs(u) > c.u_limit) || any(~isfinite(u))
-            u = u_prev;
-        else
-            u_prev = u; 
-        end
-    end
 end
 
 
