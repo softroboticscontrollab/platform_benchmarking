@@ -8,8 +8,8 @@ function u = u_computed_torque_control(x, c, t)
 
     [qd, dqd, ddqd] = desired_traj_sine(t);
 
-    e  = qd - q;
-    de = dqd - dq;
+    e  = q  - qd;
+    de = dq - dqd;
 
     % Model terms
     [M, C] = M_C_Computation(x, c);
@@ -17,10 +17,10 @@ function u = u_computed_torque_control(x, c, t)
     K = diag([c.k1, c.k2]);
     D = c.damping * eye(2);
 
-    y = ddqd + c.Kp_ct.*e + c.Kd_ct.*de;    
+    y = ddqd - c.Kp_ct.*e - c.Kd_ct.*de;   
     % y = ddqd + c.Kp_ct.*qd + c.Kd_ct.*dqd - c.Kp_ct.*q - c.Kd_ct.*dq; 
 
-    u = M*y + C*dqd + K*qd + D*dqd;
+    u = M*y + C*dq + K*q + D*dq;
 end
 
 
