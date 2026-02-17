@@ -16,7 +16,7 @@ Fmax = 11.16 * 1.6 / 100;
 
 %% Pulling reference data used for trajectory generation 
 
-RTJ = 'plotting_data/sinwave_traj_L1.csv';
+RTJ = 'plotting_data/sinwave_traj.csv';
 
 RTJ = readtable(RTJ, ...
     'HeaderLines', 2, 'VariableNamingRule', 'preserve');
@@ -48,7 +48,9 @@ Tip_y_RTJ = l2 * ((sin(q0_RTJ) .* sin(q1_RTJ) - cos(q0_RTJ) .* cos(q1_RTJ) + cos
 
 %% Pulling data from experiment XXX 
 
-XXX = 'plotting_data/ezloophw_closedloop_ros2_reserv_pneumatics_2026-2-9_140715.csv';
+% XXX = 'plotting_data/ezloophw_closedloop_ros2_reserv_pneumatics_2026-2-12_154549.csv';
+XXX = 'plotting_data/ezloophw_closedloop_ros2_reserv_pneumatics_2026-2-13_162036.csv';
+YYY = 'tuning/ezloophw_closedloop_ros2_reserv_pneumatics_2026-2-13_144529.csv';
 
 XXX = readtable(XXX, ...
     'HeaderLines', 2, 'VariableNamingRule', 'preserve');
@@ -58,10 +60,6 @@ theta_0_XXX  = XXX.theta_0;
 theta_1_XXX  = XXX.theta_1;
 
 Fp0_XXX      = XXX.ForcePlate_0;
-
-startidx_XXX = find(XXX.("u_t(0)"), 1, 'first');
-
-time_XXX     = time_XXX - time_XXX(startidx_XXX);
 
 % time_XXX = time_XXX - time_XXX(startidx_XXX);
 
@@ -92,32 +90,48 @@ Tip_y_XXX = l2 * ((sin(q0_XXX) .* sin(q1_XXX) - cos(q0_XXX) .* cos(q1_XXX) + cos
 
 %% Plotting Time 
 
+startidx_XXX = find(XXX.("u_t(0)"), 1, 'first');
+
+time_XXX     = time_XXX - time_XXX(startidx_XXX);
+
 figure(1)
-subplot(1,2,1); plot(time_RTJ,q0_RTJ);
+subplot(1,2,1); plot(time_RTJ,q0_RTJ,LineWidth=2);
 hold on 
-plot(time_XXX(startidx_XXX:end),q0_XXX(startidx_XXX:end))
+plot(time_XXX(startidx_XXX:end),q0_XXX(startidx_XXX:end),LineWidth=2)
 title('Raw State Ref Data for q0')
-subplot(1,2,2); plot(time_RTJ,q1_RTJ);
+subplot(1,2,2); plot(time_RTJ,q1_RTJ,LineWidth=2);
 hold on 
-plot(time_XXX(startidx_XXX:end),q1_XXX(startidx_XXX:end))
+plot(time_XXX(startidx_XXX:end),q1_XXX(startidx_XXX:end),LineWidth=2)
 title('Raw State Ref Data for q1')
 hold off
 
 figure(2)
-subplot(1,2,1); plot(time_RTJ,DCI0_RTJ);
+subplot(1,2,1); plot(time_RTJ,DCI0_RTJ,LineWidth=2);
 hold on 
-plot(time_XXX(startidx_XXX:end),DCI0_XXX(startidx_XXX:end))
-plot(time_XXX(startidx_XXX:end),ACI0_XXX(startidx_XXX:end))
+plot(time_XXX(startidx_XXX:end),DCI0_XXX(startidx_XXX:end),LineWidth=2)
+plot(time_XXX(startidx_XXX:end),ACI0_XXX(startidx_XXX:end),LineWidth=2)
 title('Raw Control Input vs Derived L0')
-subplot(1,2,2); plot(time_RTJ,DCI1_RTJ);
+subplot(1,2,2); plot(time_RTJ,DCI1_RTJ,LineWidth=2);
 hold on 
-plot(time_XXX(startidx_XXX:end),DCI1_XXX(startidx_XXX:end))
-plot(time_XXX(startidx_XXX:end),ACI1_XXX(startidx_XXX:end))
+plot(time_XXX(startidx_XXX:end),DCI1_XXX(startidx_XXX:end),LineWidth=2)
+plot(time_XXX(startidx_XXX:end),ACI1_XXX(startidx_XXX:end),LineWidth=2)
 title('Raw Control Input vs Derived L1')
 hold off
 
-[dq0, ddq0] = sgolay_derivatives(q0_RTJ, time_RTJ, 241, 3);
-[dq1, ddq1] = sgolay_derivatives(q1_RTJ, time_RTJ, 241, 3);
+[dq0_RTJ, ddq0_RTJ] = sgolay_derivatives(q0_RTJ, time_RTJ, 241, 3);
+[dq1_RTJ, ddq1_RTJ] = sgolay_derivatives(q1_RTJ, time_RTJ, 241, 3);
+
+e0 = q0_RTJ - q0_XXX(startidx_XXX:startidx_XXX + length(q0_RTJ)-1);
+e1 = q1_RTJ - q1_XXX(startidx_XXX:startidx_XXX + length(q1_RTJ)-1);
+
+[de0, dde0] = sgolay_derivatives(e0, time_XXX(startidx_XXX:end), 241, 3);
+[de1, dde1] = sgolay_derivatives(e1, time_XXX(startidx_XXX:end), 241, 3);
+
+figure(3) 
+subplot(2,2,1); plot(time_RTJ,e0);title('e0')
+subplot(2,2,2); plot(time_RTJ,e1);title('e1')
+subplot(2,2,3); plot(time_RTJ,de0);title('de0')
+subplot(2,2,4); plot(time_RTJ,de1);title('de1')
 
 % figure(2)
 % subplot(1,2,1); plot(time_RTJ,dq0);

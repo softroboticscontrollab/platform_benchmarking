@@ -90,7 +90,10 @@ l2 = 0.122;
 % k1 = 75.5; k2 = 128;
 
 %%% from Akua relacibration 2025-10-27
-k1 = 147.55762; k2 = 253.56177;
+%k1 = 147.55762; k2 = 253.56177;
+
+%%% from Akua recalibration with big t ags 2026-02-13
+k1 = 137.20584; k2 = 239.44695;
 
 damping = 5.0; %used to be 3
 % damping = 5.0;
@@ -158,11 +161,10 @@ c.gam = gam;
 
 %% PID Controller Setups 
 Kp = [10; 10]; Kd = [1; 1]; 
-Kp_ct = [10;10]; Kd_ct = [2;2];
+Kp_ct = [5;5]; Kd_ct = [1;1];
 c.p_des = p_des; c.Kp = Kp; 
 c.Kd = Kd; c.Kp_ct = Kp_ct; 
 c.Kd_ct = Kd_ct; 
-
 %%
 % which controller to choose. This is the combined controller, both nom and
 % safe supervisor.
