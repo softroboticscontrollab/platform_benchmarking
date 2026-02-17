@@ -11,10 +11,10 @@ function u = u_pd_control_trajectory(x, c, t)
     de = dp_des - dq;
 
     % feedforward term
-    u_ff = diag([c.k1, c.k2]) * p_des;
+    % u_ff = diag([c.k1, c.k2]) * p_des;
 
     % PD feedback
-    u = u_ff + c.Kp .* e + c.Kd .* de;
+    u = c.Kp .* e + c.Kd .* de;
 end
 
 function [qd, dqd, ddqd] = desired_traj_sine(t)

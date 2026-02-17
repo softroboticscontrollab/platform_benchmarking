@@ -15,7 +15,8 @@ e = c.p_des - q;
 
 de = -dq;
 
-u = diag([c.k1, c.k2])*c.p_des + c.Kp .* e + c.Kd .* de;
+% u = diag([c.k1, c.k2])*c.p_des + c.Kp .* e + c.Kd .* de;
+u = c.Kp .* e + c.Kd .* de;
 
 end
 

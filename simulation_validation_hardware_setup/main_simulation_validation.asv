@@ -26,7 +26,7 @@ g = 9.81; tol = 1e4;
 F_max = 0.16; k_env = 11.16;
 aE = 0.2; bE = 0.2; gam = 0.2;  
 p_des = [1; 1];  
-Kp = [5000;5000]; Kd = [10;10];  
+Kp = [500;500]; Kd = [1;1];  
 Kp_ct = [10;10]; Kd_ct = [1;1];
 u_limit = 250;
 
@@ -83,7 +83,7 @@ for k = 1:n
 end
 
 %% Downsample for plotting at 100 Hz
-disp(u_traj);
+% disp(u_traj);
 plot_freq = 10;                  % Hz
 plot_dt = 1 / plot_freq;          % seconds between plot points
 plot_interval = round(plot_dt / dt);  % number of simulation steps to skip
