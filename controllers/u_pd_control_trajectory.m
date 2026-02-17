@@ -20,7 +20,7 @@ end
 function [qd, dqd, ddqd] = desired_traj_sine(t)
     persistent Fq1 Fq2 Fdq1 Fdq2 Fddq1 Fddq2 tmin tmax
     if isempty(Fq1)
-        data = readtable('sinwave_traj_L1.csv', ...
+        data = readtable('sinwave_traj.csv', ...
         'HeaderLines', 2, 'VariableNamingRule', 'preserve');
 
         time_data = data.("Test time");
@@ -30,16 +30,13 @@ function [qd, dqd, ddqd] = desired_traj_sine(t)
         q1 = deg2rad(2*data.theta_0(:));
         q2 = deg2rad(2*data.theta_1(:));
 
-        q1_smooth = smoothdata(q1, 'sgolay', 40);
-        q2_smooth = smoothdata(q2, 'sgolay', 40);
-
         window_length = 241;
         poly_order    = 3;
-        [q1_dot, q1_ddot] = sgolay_derivatives(q1_smooth, time_data, window_length, poly_order);
-        [q2_dot, q2_ddot] = sgolay_derivatives(q2_smooth, time_data, window_length, poly_order);
+        [q1_dot, q1_ddot] = sgolay_derivatives(q1, time_data, window_length, poly_order);
+        [q2_dot, q2_ddot] = sgolay_derivatives(q2, time_data, window_length, poly_order);
 
-        Fq1   = griddedInterpolant(time_data, q1_smooth, 'linear', 'nearest');
-        Fq2   = griddedInterpolant(time_data, q2_smooth, 'linear', 'nearest');
+        Fq1   = griddedInterpolant(time_data, q1, 'linear', 'nearest');
+        Fq2   = griddedInterpolant(time_data, q2, 'linear', 'nearest');
         Fdq1  = griddedInterpolant(time_data, q1_dot,  'linear', 'nearest');
         Fdq2  = griddedInterpolant(time_data, q2_dot,  'linear', 'nearest');
         Fddq1 = griddedInterpolant(time_data, q1_ddot, 'linear', 'nearest');
