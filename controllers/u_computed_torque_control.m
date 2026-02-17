@@ -2,8 +2,6 @@ function u = u_computed_torque_control(x, c, t)
     % Computed torque controller for 2-DOF planar arm/soft-joint model
     % State x = [q1;q2;dq1;dq2]
     % Uses desired trajectory qd(t), dqd(t), ddqd(t)
-
-
     persistent u_prev
     if isempty(u_prev)
         u_prev = zeros(2,1);   

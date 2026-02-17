@@ -13,7 +13,7 @@ addpath(genpath('../../polyhedron_constraints'));
 disp('Running simulation with PID Controller...');
 
 %% Simulation parameters
-tmax = 20; dt = 0.00001;
+tmax = 5; dt = 0.00001;
 
 n = round(tmax/dt);
 
@@ -25,7 +25,7 @@ l1 = 0.122; l2 = 0.122;
 g = 9.81; tol = 1e4;
 F_max = 0.16; k_env = 11.16;
 aE = 0.2; bE = 0.2; gam = 0.2;  
-p_des = [deg2rad(30); deg2rad(30)];  
+p_des = [1; 1];  
 Kp = [10;10]; Kd = [1;1];  
 Kp_ct = [10;10]; Kd_ct = [1;1];
 u_limit = 250;
@@ -68,8 +68,8 @@ for k = 1:n
     t = (k-1)*dt; 
 
     % u_t = u_pid_control(x_traj(1:2,t), x_traj(3:4,t), q_des, dt, c);
-    % u_t = u_pd_control(x_traj(:,k), c, t);
-    u_t = u_computed_torque_control(x_traj(:,k), c, t);
+    u_t = u_pd_control(x_traj(:,k), c, t);
+    % u_t = u_computed_torque_control(x_traj(:,k), c, t);
 
     u_traj(:, k) = u_t;
     [~, bolddotx_t] = dynamics_soft(x_traj(:,k), c, u_t);
@@ -83,6 +83,7 @@ for k = 1:n
 end
 
 %% Downsample for plotting at 100 Hz
+disp(u_traj);
 plot_freq = 10;                  % Hz
 plot_dt = 1 / plot_freq;          % seconds between plot points
 plot_interval = round(plot_dt / dt);  % number of simulation steps to skip
@@ -118,7 +119,7 @@ V = [0.35, 0.0322;
 [H, h] = computeSafetyConstraints(V);
 
 %% Plot
-Soft_CBF_plotting(x_traj(1 :2, :), [l1, l2], H, h, F_max, k_env, dt);
+% Soft_CBF_plotting(x_traj(1 :2, :), [l1, l2], H, h, F_max, k_env, dt);
 
 % function u = u_pid_control(q, dq, q_des, dt, c)
 % 
