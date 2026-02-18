@@ -281,7 +281,7 @@ lgd.FontSize = 15;
 ylabel('q_0 (radians)','FontSize',14) 
 % xlabel('Time (s)','FontSize',14) 
 
-title('Tracking with CD w/o Force Plate')
+title('Tracking with ID w/o Force Plate')
 
 hold off 
 
@@ -343,6 +343,18 @@ force1_ucdw3   = ucdw3.("ForcePlate_0");
 force1_ucdw4   = ucdw4.("ForcePlate_0");
 force1_ucdw5   = ucdw5.("ForcePlate_0");
 
+force1_ucdw1   = force1_ucdw1/1000*9.8; % changing grams to newtons
+force1_ucdw2   = force1_ucdw2/1000*9.8;
+force1_ucdw3   = force1_ucdw3/1000*9.8;
+force1_ucdw4   = force1_ucdw4/1000*9.8;
+force1_ucdw5   = force1_ucdw5/1000*9.8;
+
+rho_ucdw1 = (Fmax - force1_ucdw1)/Fmax;
+rho_ucdw2 = (Fmax - force1_ucdw2)/Fmax;
+rho_ucdw3 = (Fmax - force1_ucdw3)/Fmax;
+rho_ucdw4 = (Fmax - force1_ucdw4)/Fmax;
+rho_ucdw5 = (Fmax - force1_ucdw5)/Fmax;
+
 q0_ucdw1 = deg2rad(ucdw1.theta_0*2);
 q1_ucdw1 = deg2rad(ucdw1.theta_1*2);
 q0_ucdw2 = deg2rad(ucdw2.theta_0*2);
@@ -382,18 +394,6 @@ q0_ucdw4 = q0_ucdw4(start_idx4:end_idx4);
 q1_ucdw4 = q1_ucdw4(start_idx4:end_idx4);
 q0_ucdw5 = q0_ucdw5(start_idx5:end_idx5);
 q1_ucdw5 = q1_ucdw5(start_idx5:end_idx5);
-
-force1_ucdw1   = force1_ucdw1(start_idx1:end_idx1)/1000*9.8; % changing grams to newtons
-force1_ucdw2   = force1_ucdw2(start_idx2:end_idx2)/1000*9.8;
-force1_ucdw3   = force1_ucdw3(start_idx3:end_idx3)/1000*9.8;
-force1_ucdw4   = force1_ucdw4(start_idx4:end_idx4)/1000*9.8;
-force1_ucdw5   = force1_ucdw5(start_idx5:end_idx5)/1000*9.8;
-
-rho_ucdw1 = (Fmax - force1_ucdw1)/Fmax;
-rho_ucdw2 = (Fmax - force1_ucdw2)/Fmax;
-rho_ucdw3 = (Fmax - force1_ucdw3)/Fmax;
-rho_ucdw4 = (Fmax - force1_ucdw4)/Fmax;
-rho_ucdw5 = (Fmax - force1_ucdw5)/Fmax;
 
 q0_ucdw_all = [q0_ucdw1,q0_ucdw2,q0_ucdw3,q0_ucdw4,q0_ucdw5];
 mu = mean(q0_ucdw_all,2);
@@ -441,7 +441,7 @@ lgd.FontSize = 15;
 ylabel('q_0 (radians)','FontSize',14) 
 % xlabel('Time (s)','FontSize',14) 
 
-title('Tracking with CD with Force Plate')
+title('Tracking with ID with Force Plate')
 
 hold off 
 
@@ -483,12 +483,12 @@ hold on
 p1 = plot(time_RTJ(startidx_RTJ:end),rho_max,LineWidth=2,Color='red',LineStyle="--");
 p2 = plot(time_RTJ(startidx_RTJ:end),rho_ucdw_mean(2:end),LineWidth=1,Color=[0 0.604 0.192]);
 
-lgd = legend([p1 p2],{'Minimum Rho','Calculated Rho'},Location='northeast');    
+lgd = legend([p1 p2],{'Maximum','Achieved Trajectory'},Location='northeast');    
 lgd.FontSize = 15;
 
-ylabel('Rho','FontSize',14) 
-xlabel('Time (s)','FontSize',14) 
+ylabel('q_0 (radians)','FontSize',14) 
+% xlabel('Time (s)','FontSize',14) 
 
-title('Force Safety by CD')
+title('Tracking with ID with Force Plate')
 
 hold off 

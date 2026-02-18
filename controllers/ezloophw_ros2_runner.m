@@ -169,10 +169,11 @@ c.Kd_ct = Kd_ct;
 % which controller to choose. This is the combined controller, both nom and
 % safe supervisor.
 
-ctrlr = @u_pd_control_trajectory;
+ctrlr = @u_computed_torque_control;
 
-%@u_computed_torque_control
-%@u_sim_traj
+%u_pd_control_trajectory
+%u_computed_torque_control
+%u_sim_traj
 
 %% Initialize ROS2 nodes for the MATLAB side
 % we are this node for sending control commands
