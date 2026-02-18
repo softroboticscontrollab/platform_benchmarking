@@ -3,6 +3,11 @@ function u = u_pd_control_trajectory(x, c, t)
     q  = x(1:2);
     dq = x(3:4);
 
+    persistent u_prev
+    if isempty(u_prev)
+        u_prev = zeros(2,1);   
+    end
+
     % Desired trajectory at time t
     [p_des, dp_des, ~] = desired_traj_sine(t);
 
@@ -15,6 +20,15 @@ function u = u_pd_control_trajectory(x, c, t)
 
     % PD feedback
     u = c.Kp .* e + c.Kd .* de;
+
+    % numerical stability check
+    if isfield(c,'u_limit') && ~isempty(c.u_limit)
+        if any(abs(u) > c.u_limit) || any(~isfinite(u))
+            u = u_prev;
+        else
+            u_prev = u; 
+        end
+    end
 end
 
 function [qd, dqd, ddqd] = desired_traj_sine(t)

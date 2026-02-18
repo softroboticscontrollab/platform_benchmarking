@@ -49,7 +49,7 @@ Tip_y_RTJ = l2 * ((sin(q0_RTJ) .* sin(q1_RTJ) - cos(q0_RTJ) .* cos(q1_RTJ) + cos
 %% Pulling data from experiment XXX 
 
 % XXX = 'plotting_data/ezloophw_closedloop_ros2_reserv_pneumatics_2026-2-12_154549.csv';
-XXX = 'plotting_data/ezloophw_closedloop_ros2_reserv_pneumatics_2026-2-13_162036.csv';
+XXX = 'plotting_data/ezloophw_closedloop_ros2_reserv_pneumatics_2026-2-17_164144.csv';
 YYY = 'tuning/ezloophw_closedloop_ros2_reserv_pneumatics_2026-2-13_144529.csv';
 
 XXX = readtable(XXX, ...

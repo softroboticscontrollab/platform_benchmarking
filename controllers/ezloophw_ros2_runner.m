@@ -160,7 +160,7 @@ c.bE = bE;
 c.gam = gam;
 
 %% PID Controller Setups 
-Kp = [10; 10]; Kd = [1; 1]; 
+Kp = [160; 160]; Kd = [1; 1]; 
 Kp_ct = [5;5]; Kd_ct = [1;1];
 c.p_des = p_des; c.Kp = Kp; 
 c.Kd = Kd; c.Kp_ct = Kp_ct; 
@@ -169,7 +169,7 @@ c.Kd_ct = Kd_ct;
 % which controller to choose. This is the combined controller, both nom and
 % safe supervisor.
 
-ctrlr = @u_computed_torque_control;
+ctrlr = @u_pd_control_trajectory;
 
 %@u_computed_torque_control
 %@u_sim_traj
