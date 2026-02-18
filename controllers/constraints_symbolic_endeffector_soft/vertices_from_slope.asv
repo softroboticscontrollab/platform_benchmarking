@@ -1,0 +1,29 @@
+% Given values
+m = -0.36397;                  % desired slope (e.g., tan(7*pi/18))
+m = 0.176327;
+% p1 = [0.2; -0.2];           % starting point [x1; y1]
+p1 = [0.35, -0.005];           % starting point [x1; y1]
+dx = -0.35;                  % horizontal distance
+
+% Compute second point
+x2 = p1(1) + dx;
+y2 = p1(2) + m * dx;
+p2 = [x2; y2];
+
+% Verify slope
+computed_slope = (p2(2) - p1(2)) / (p2(1) - p1(1));
+fprintf('Expected slope: %.4f\n', m);
+fprintf('Computed slope: %.4f\n', computed_slope);
+
+% Plot
+figure; hold on; axis equal; grid on;
+plot([p1(1), p2(1)], [p1(2), p2(2)], 'r-', 'LineWidth', 2);
+scatter(p1(1), p1(2), 80, 'b', 'filled');
+scatter(p2(1), p2(2), 80, 'g', 'filled');
+text(p1(1), p1(2)-0.02, 'p1', 'HorizontalAlignment', 'center');
+text(p2(1), p2(2)+0.02, 'p2', 'HorizontalAlignment', 'center');
+title('Line Segment with Desired Slope');
+xlabel('x'); ylabel('y');
+
+
+
