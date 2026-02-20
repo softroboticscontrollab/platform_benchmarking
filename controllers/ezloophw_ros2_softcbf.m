@@ -4,7 +4,7 @@
 % via a CBF-based QP supervisory control system.
 
 %%% Setup just to make sure we start at the same state each time. 
-clear all
+clear
 close all
 clc;
 
@@ -76,11 +76,11 @@ l2 = 0.122;
 % damping = 10.0;
 % k1 = 130.85249; 
 % k2 = 165.12965;
-damping = 3.5; % 3.5
+damping = 5; % 3.5
 % k1 = 75.41558; 
-k1 = 69.48618;
+k1 = 137.20584;
 % k2 = 112.84726; 
-k2 = 89.03760;
+k2 = 239.44695;
 tol = 10^4; % numerical tolerance for instability: if f(x) is greater than this, in any element, assume our simulation has encountered a big issue and stop integrating
 
 c.m2 = m2;
@@ -94,10 +94,10 @@ c.l2 = l2;
 c.g = 9.81; % not used -- to do, clean up constants
 
 % constants for the nominal controller: sinusoids
-c.amp1 = 80; % amp1 = 45 for CBF paper 80
-c.amp2 = 80; % amp2 = 45 for CBF paper 80
-per1 = 100; % per1 = 60 for CBF paper 100
-per2 = 100; % per2 = 60 for CBF paper 100
+c.amp1 = 160; % amp1 = 45 for CBF paper 80
+c.amp2 = 160; % amp2 = 45 for CBF paper 80
+per1 = 140; % per1 = 60 for CBF paper 100
+per2 = 140; % per2 = 60 for CBF paper 100
 c.freq1 = 1/per1;
 c.freq2 = 1/per2;
 c.shift1 = 0;
@@ -106,10 +106,10 @@ c.shift2 = 0;
 % constants for the CBF-based supervisor
 F_max = 0.16; 
 k_env = 11.16;
-aE = 5; % 0.2 1 2 20
+aE = 0.39; % 0.2 1 2 20
 % aE = 10; % even more conservative
-bE = 5; % 0.2 1 2 20
-gam = 5; % 0.2 1 2 20
+bE = 0.39; % 0.2 1 2 20
+gam = 0.1; % 0.2 1 2 20
 % aE = 1050;
 % bE = 1050;
 % gam = 2000;
@@ -121,6 +121,15 @@ c.F_max = F_max;
 c.aE = aE;
 c.bE = bE;
 c.gam = gam;
+p_des = [deg2rad(45); deg2rad(45)];  
+
+%% PID Controller Setups 
+Kp = [160; 160]; Kd = [1; 1]; 
+Kp_ct = [5;5]; Kd_ct = [1;1];
+c.p_des = p_des; c.Kp = Kp; 
+c.Kd = Kd; c.Kp_ct = Kp_ct; 
+c.Kd_ct = Kd_ct; 
+%%
 
 % which controller to choose. This is the combined controller, both nom and
 % safe supervisor.

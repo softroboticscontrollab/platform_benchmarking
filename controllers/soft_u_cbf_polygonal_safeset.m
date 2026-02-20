@@ -92,14 +92,14 @@ b_input = [ 80;
 % A = [a1_prime];
 % b = [b1_prime];
 
-% A = [a1_prime];
-% b = [b1_prime];
+A = [a1_prime];
+b = [b1_prime];
 
 % A = [a3;a_input];
 % b = [b3;b_input];
 
-A = [a1];
-b = [b1];
+% A = [a1];
+% b = [b1];
 
 % A = [a3_prime];
 % b = [b3_prime];
