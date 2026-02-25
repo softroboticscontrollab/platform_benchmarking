@@ -37,36 +37,6 @@ constraintsdir = '../../polyhedron_constraints';
 addpath(genpath(constraintsdir));
 
 %% Setup and constants for the controllers and dynamics model
-
-% % Open loop nominal controller reads from this file:
-% ol_hw_datafile = 'ezloophw_closedloop_ros2_pneumatics_2025-4-9_110543.csv';
-% 
-% % read and preprocess
-% ol_hw_data = readtable(ol_hw_datafile, 'HeaderLines', 2, 'VariableNamingRule', 'preserve');
-% 
-% time     = ol_hw_data.("Test time");
-% theta_0  = ol_hw_data.theta_0;
-% theta_1  = ol_hw_data.theta_1;
-% mpr_0    = ol_hw_data.MPRpressure_0;
-% mpr_1    = ol_hw_data.MPRpressure_1;
-% mpr_2    = ol_hw_data.MPRpressure_2;
-% mpr_3    = ol_hw_data.MPRpressure_3;
-% 
-% % Convert angles from degrees to radians
-% theta_0 = deg2rad(theta_0);
-% theta_1 = deg2rad(theta_1);
-% 
-% time_data = ow_hw_data.("Test time");
-% smoothed_theta_0 = theta_0;
-% smoothed_theta_1 = theta_1;
-% smoothed_mpr_0 = smoothdata(mpr_0, 'sgolay', 12);
-% smoothed_mpr_1 = smoothdata(mpr_1, 'sgolay', 12);
-% smoothed_mpr_2 = smoothdata(mpr_2, 'sgolay', 12);
-% smoothed_mpr_3 = smoothdata(mpr_3, 'sgolay', 12);
-% 
-% % Get the ...
-
-
 % constants for the dynamics + robot geometry
 
 m2 = 0.13; % kg

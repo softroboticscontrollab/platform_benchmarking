@@ -1,10 +1,10 @@
-% % ezloophw_ros2_softcbf.m
+% ezloophw_ros2_softcbf.m
 % (C) Soft Robotics Control Lab 2025
 % Closed loop control of a 2-segment soft manipulator over ROS2 with safety
 % via a CBF-based QP supervisory control system.
 
 %%% Setup just to make sure we start at the same state each time. 
-clear all
+clear
 close all
 clc;
 
@@ -44,34 +44,14 @@ m2 = 0.13; % kg
 m6 = 0.13;
 l1 = 0.122;
 l2 = 0.122;
-
-%%% from Juan/Akua as of 2025-07-24
 % damping = 10.0;
 % k1 = 130.85249; 
 % k2 = 165.12965;
-% damping = 3.5; % 3.5
+damping = 5; % 3.5
 % k1 = 75.41558; 
+k1 = 137.20584;
 % k2 = 112.84726; 
-
-% most recent?
-% k1 = 69.48618;
-% k2 = 89.03760;
-
-%%% from Drew recalibration 2025-07-26+
-% k1 = 75.5; k2 = 128;
-
-%%% from Akua relacibration 2025-10-27
-%k1 = 147.55762; k2 = 253.56177;
-
-%%% from Akua recalibration with big t ags 2026-02-13
-k1 = 137.20584; k2 = 239.44695;
-
-damping = 5.0; %used to be 3
-% damping = 5.0;
-% damping = 10.0; % A larger damping constant means that the simulation has less motion under a change in u.
-% damping = 20.0; %...but a larger damping for the model means that the
-% CBF-based QP predicts less motion than actually occurs.
-
+k2 = 239.44695;
 tol = 10^4; % numerical tolerance for instability: if f(x) is greater than this, in any element, assume our simulation has encountered a big issue and stop integrating
 
 c.m2 = m2;
@@ -87,48 +67,32 @@ c.g = 9.81; % not used -- to do, clean up constants
 % constants for the nominal controller: sinusoids
 c.amp1 = 160; % amp1 = 45 for CBF paper 80
 c.amp2 = 160; % amp2 = 45 for CBF paper 80
-% c.amp1 = 45; % April 2025 used 45
-% c.amp2 = 45; % April 2025 used 45
 per1 = 140; % per1 = 60 for CBF paper 100
 per2 = 140; % per2 = 60 for CBF paper 100
 c.freq1 = 1/per1;
 c.freq2 = 1/per2;
 c.shift1 = 0;
 c.shift2 = 0;
-c.u_limit = 250;
 
 % constants for the CBF-based supervisor
-F_max = 0.16; % shouldn't this be 0.1786? 11.16*1.6/1000
+F_max = 0.16; 
 k_env = 11.16;
-
-%%% Juan/Akua constants as of 2025-07-24
-% aE = 5; % 0.2 1 2 20
-% bE = 5; % 0.2 1 2 20
-% gam = 5; % 0.2 1 2 20
-
+aE = 0.39; % 0.2 1 2 20
 % aE = 10; % even more conservative
+bE = 0.39; % 0.2 1 2 20
+gam = 0.1; % 0.2 1 2 20
 % aE = 1050;
 % bE = 1050;
 % gam = 2000;
 % k_env = 10;
 % F_max = 20;
 
-%%% Comparison with April 2025 constants
-% aE = 2.0; bE = 2.0; gam = 2.0; % medium from the April 2025 paper
-% aE = 0.2; bE = 0.2; gam = 0.2; % high from the April 2025 paper
-
-% aE = 20.0; bE = 20.0; gam = 20.0; % low conservative. Fixed as of 2025-07-26
-% aE = 5.0; bE = 5.0; gam = 5.0; % medium
-% aE = 1.0; bE = 1.0; gam = 1.0; % high
-
-aE = 0.1; bE = 0.1; gam = 0.1;
-p_des = [deg2rad(45); deg2rad(45)];  
-
 c.k_env = k_env;
 c.F_max = F_max;
 c.aE = aE;
 c.bE = bE;
 c.gam = gam;
+p_des = [deg2rad(45); deg2rad(45)];  
 
 %% PID Controller Setups 
 Kp = [160; 160]; Kd = [1; 1]; 
@@ -137,14 +101,10 @@ c.p_des = p_des; c.Kp = Kp;
 c.Kd = Kd; c.Kp_ct = Kp_ct; 
 c.Kd_ct = Kd_ct; 
 %%
+
 % which controller to choose. This is the combined controller, both nom and
 % safe supervisor.
-
 ctrlr = @u_softcbf_combined;
-
-%u_pd_control_trajectory
-%u_computed_torque_control
-%u_sim_traj
 
 %% Initialize ROS2 nodes for the MATLAB side
 % we are this node for sending control commands
@@ -175,12 +135,8 @@ subtopic = 'ezloophw_sensors';
 % ros
 global bendingVec;
 global prevBendingVec; % for velocities finite difference
-global prevdBendingVec; 
 global n_smooth_prev_velocity; % velocity smoothing
 global dBendingVec; % the calculated velocity finite difference
-
-global q_storage; % storing values for debugging 
-global dq_storage; % storing values for debugging
 
 rxCallbackHandles.node = matlabSubNode;
 % for calculating dq/dt
@@ -194,10 +150,6 @@ bendingVec = zeros(1,2);
 n_smooth_prev_velocity = 10;
 prevBendingVec = zeros(n_smooth_prev_velocity, 2); % now storing the last ten samples.
 dBendingVec = zeros(1,2);
-prevdBendingVec = zeros(n_smooth_prev_velocity, 2);
-
-q_storage = zeros(1,2);
-dq_storage = zeros(1,2);
 
 disp('Attempting to start the subscriber...')
 while ~subStarted
