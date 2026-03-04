@@ -16,7 +16,8 @@ Fmax = 11.16 * 1.6 / 100;
 
 %% Pulling reference data used for trajectory generation 
 
-RTJ = 'plotting_data/sinwave_traj.csv';
+RTJ = 'plotting_data/ezloophw_closedloop_ros2_reserv_pneumatics_2026-3-4_121806.csv';
+% RTJ = 'plotting_data/ezloophw_closedloop_ros2_reserv_pneumatics_2026-3-2_151809.csv';
 
 RTJ = readtable(RTJ, ...
     'HeaderLines', 2, 'VariableNamingRule', 'preserve');
@@ -49,7 +50,8 @@ Tip_y_RTJ = l2 * ((sin(q0_RTJ) .* sin(q1_RTJ) - cos(q0_RTJ) .* cos(q1_RTJ) + cos
 %% Pulling data from experiment XXX 
 
 % XXX = 'plotting_data/ezloophw_closedloop_ros2_reserv_pneumatics_2026-2-12_154549.csv';
-XXX = 'plotting_data/ezloophw_closedloop_ros2_reserv_pneumatics_2026-2-17_164144.csv';
+% XXX = 'plotting_data/ezloophw_closedloop_ros2_reserv_pneumatics_2026-3-2_154906.csv';
+XXX = 'plotting_data/ezloophw_closedloop_ros2_reserv_pneumatics_2026-3-4_122516.csv';
 YYY = 'tuning/ezloophw_closedloop_ros2_reserv_pneumatics_2026-2-13_144529.csv';
 
 XXX = readtable(XXX, ...

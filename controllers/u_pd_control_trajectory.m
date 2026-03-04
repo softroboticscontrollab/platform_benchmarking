@@ -1,5 +1,5 @@
 function u = u_pd_control_trajectory(x, c, t)
-
+    
     q  = x(1:2);
     dq = x(3:4);
 

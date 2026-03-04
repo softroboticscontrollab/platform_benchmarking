@@ -72,13 +72,16 @@ b3_prime = expansion_soft_constraints_face3_b(x, c.l1, c.l2, c.m2, c.m6, c.k1, c
      c.aE, c.bE, c.gam, c.g);
 
 %control input constraints
-a_input = [ eye(2);
-           -eye(2)];
+% a_input = [ eye(2);
+%            -eye(2)];
 
-b_input = [ 80;
-            80;
-            80;
-            80 ];
+% a_input = [ eye(2),zeros(2);
+%            -eye(2),zeros(2)];
+
+% b_input = [ 180;
+%             180;
+%             180;
+%             180 ];
 
 % A = [a1; a2; a3];
 % b = [b1; b2; b3]; 
@@ -89,11 +92,11 @@ b_input = [ 80;
 % A = [a1; a3];
 % b = [b1; b3];
 
-% A = [a1_prime];
-% b = [b1_prime];
-
 A = [a1_prime];
 b = [b1_prime];
+
+% A = [a1_prime;a_input];
+% b = [b1_prime;b_input];
 
 % A = [a3;a_input];
 % b = [b3;b_input];

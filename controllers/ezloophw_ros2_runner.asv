@@ -91,8 +91,8 @@ c.l2 = l2;
 c.g = 9.81; % not used -- to do, clean up constants
 
 % constants for the nominal controller: sinusoids
-c.amp1 = 100; % amp1 = 45 for CBF paper 80
-c.amp2 = 100; % amp2 = 45 for CBF paper 80
+c.amp1 = 160; % amp1 = 45 for CBF paper 80
+c.amp2 = 160; % amp2 = 45 for CBF paper 80
 % c.amp1 = 45; % April 2025 used 45
 % c.amp2 = 45; % April 2025 used 45
 per1 = 140; % per1 = 60 for CBF paper 100
@@ -146,8 +146,8 @@ c.Kd_ct = Kd_ct;
 % which controller to choose. This is the combined controller, both nom and
 % safe supervisor.
 
-% ctrlr = @u_softcbf_combined;
-ctrlr = @u_computed_torque_control;
+ctrlr = @u_softcbf_combined;
+% ctrlr = @u_computed_torque_control;
 
 %u_pd_control_trajectory
 %u_computed_torque_control
