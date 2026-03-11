@@ -3,13 +3,14 @@ function u = u_Pressuretunner(~,~,t)
 % u = 0 for first half-period
 % u = 100 for second half-period
 
-T = 20;
+T = 40;
 
 phase = mod(t, T);
 
 if phase < T/2
-    u = [0;0];
+    u = [70;0];
 else
-    u = [0;-100];
+    u = [0;-70];
 end
+
 end

@@ -18,17 +18,24 @@ function ezloophwROS2BendingAngleCallback(message, handles)
     global dq_storage
 
     % get the time since last message received
+    % --- Settings ---
+    sigma = 0.06;        % Smoothing factor
+    hw_sigma = 3;        % This results in halfWidth = 2 (0.08s lag)
+
     tnow = double(ros2time(handles.node,'now').sec) + double(ros2time(handles.node,'now').nanosec) * 1e-9;
     dt = tnow - prevRxTime;
     prevRxTime = tnow;
+
+    % --- Initialization ---
+    myFilter = RobotStateFilter(dt, sigma, hw_sigma, 2);
 
     % Extract position and orientation from the ROS message and assign the
     % data to the global variables.
 
     if ~isempty(message.data)
         % Cycle through the bending vector list
-        a = prevBendingVec;
-        prevBendingVec(1:end-1, :) = prevBendingVec(2:end, :);
+%         a = prevBendingVec;
+        prevBendingVec(1:end-1, :) = prevBendingVec(2:end, :); % move the data up in the stack
         bendingVec = message.data(:)';  % Row vector
         % convert angle from theta to state q
         bendingVec = 2*bendingVec;
@@ -37,15 +44,11 @@ function ezloophwROS2BendingAngleCallback(message, handles)
         % insert new sample
         prevBendingVec(end,:) = bendingVec;
         % finite difference
-        q_storage = [q_storage; bendingVec];
-        % dBendingVec = (bendingVec - prevBendingVec)/dt; % wrong dimensional
-        % averaging filter
-        
-        % average velocity of the last ten
-%         dBendingVec = sum(prevBendingVec-a,1)/n_smooth_prev_velocity/dt;
-        % no average velocity, just current velocity
-        dBendingVec = (prevBendingVec(end,:)- prevBendingVec(end-1,:))/dt;
+        % dBendingVec = (prevBendingVec(end,:)- prevBendingVec(end-1,:))/dt;
+        % Assuming ‘prevBendingVec’ is your 10x2 matrix
+        [bendingVec, dBendingVec] = myFilter.process(prevBendingVec);
         % debugging
+        q_storage = [q_storage; bendingVec];
         dq_storage = [dq_storage; dBendingVec];
         disp("Received " + string(bendingVec) + ", velocities " + string(dBendingVec));
     end

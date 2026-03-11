@@ -70,9 +70,12 @@ l2 = 0.122;
 % k1 = 148.26985; k2 = 241.11158;
 
 %%% from akua recab again 2026-03-4
-k1 = 137.75020; k2 = 213.18483;
+% k1 = 137.75020; k2 = 213.18483;
 
-damping = 3.5; 
+%%%% new calibration
+k1 = 145.00178; k2 = 221.19751;
+
+damping = 3; %3.5 
 % damping = 5.0;
 % damping = 10.0; % A larger damping constant means that the simulation has less motion under a change in u.
 % damping = 20.0; %...but a larger damping for the model means that the
@@ -91,8 +94,8 @@ c.l2 = l2;
 c.g = 9.81; % not used -- to do, clean up constants
 
 % constants for the nominal controller: sinusoids
-c.amp1 = 100; % amp1 = 45 for CBF paper 80
-c.amp2 = 100; % amp2 = 45 for CBF paper 80
+c.amp1 = 160; % amp1 = 45 for CBF paper 80
+c.amp2 = 160; % amp2 = 45 for CBF paper 80
 % c.amp1 = 45; % April 2025 used 45
 % c.amp2 = 45; % April 2025 used 45
 per1 = 140; % per1 = 60 for CBF paper 100
@@ -127,7 +130,8 @@ k_env = 11.16;
 % aE = 5.0; bE = 5.0; gam = 5.0; % medium
 % aE = 1.0; bE = 1.0; gam = 1.0; % high
 
-aE = 1; bE = 0.5; gam = 0.0001;
+% aE = 1; bE = 0.5; gam = 0.0001;
+aE = 0.3; bE = 0.3; gam = 0.3;
 p_des = [deg2rad(30); deg2rad(30)];  
 
 c.k_env = k_env;
@@ -148,6 +152,7 @@ c.Kd_ct = Kd_ct;
 
 % ctrlr = @u_softcbf_combined;
 ctrlr = @u_computed_torque_control;
+% ctrlr = @u_Pressuretunner;
 
 %u_pd_control_trajectory
 %u_computed_torque_control
@@ -241,7 +246,7 @@ simTimer = ezloophwROS2Timer(pubRate, {@ezloophwROS2ControlTimer,timerHandles});
 
 %% Main loop. Just waits until user clicks q in window,
 
-disp('Press q in the open MATLAB figure window to stop ROS2 from the MATLAB side.');
+disp('Press q in the open MATLAB figure  window to stop ROS2 from the MATLAB side.');
 disp('If you close the window by accident, run clear all from the matlab command prompt.')
 
 % so that the window can stop ros nodes

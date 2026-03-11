@@ -16,7 +16,7 @@ Fmax = 11.16 * 1.6 / 100;
 
 %% Pulling reference data used for trajectory generation 
 
-RTJ = 'plotting_data/ezloophw_closedloop_ros2_reserv_pneumatics_2026-3-4_121806.csv';
+RTJ = 'plotting_data/ezloophw_closedloop_ros2_reserv_pneumatics_2026-3-5_141727.csv';
 % RTJ = 'plotting_data/ezloophw_closedloop_ros2_reserv_pneumatics_2026-3-2_151809.csv';
 
 RTJ = readtable(RTJ, ...
@@ -51,7 +51,7 @@ Tip_y_RTJ = l2 * ((sin(q0_RTJ) .* sin(q1_RTJ) - cos(q0_RTJ) .* cos(q1_RTJ) + cos
 
 % XXX = 'plotting_data/ezloophw_closedloop_ros2_reserv_pneumatics_2026-2-12_154549.csv';
 % XXX = 'plotting_data/ezloophw_closedloop_ros2_reserv_pneumatics_2026-3-2_154906.csv';
-XXX = 'plotting_data/ezloophw_closedloop_ros2_reserv_pneumatics_2026-3-4_122516.csv';
+XXX = 'plotting_data/ezloophw_closedloop_ros2_reserv_pneumatics_2026-3-9_121724.csv';
 YYY = 'tuning/ezloophw_closedloop_ros2_reserv_pneumatics_2026-2-13_144529.csv';
 
 XXX = readtable(XXX, ...
@@ -74,7 +74,7 @@ L0_P0_XXX = XXX.("MPRpressure_0");
 %L0_P0_FIL_XXX = XXX.("FILpressure_0");
 
 % Valve aperture data 
-L0_val0_XXX = XXX.("ValveOpening_0");
+%L0_val0_XXX = XXX.("ValveOpening_0");
 
 % Derived Control Input 
 DCI0_XXX = XXX.("MPRpressure_0") - XXX.("MPRpressure_1");
@@ -123,17 +123,17 @@ hold off
 [dq0_RTJ, ddq0_RTJ] = sgolay_derivatives(q0_RTJ, time_RTJ, 241, 3);
 [dq1_RTJ, ddq1_RTJ] = sgolay_derivatives(q1_RTJ, time_RTJ, 241, 3);
 
-e0 = q0_RTJ - q0_XXX(startidx_XXX:startidx_XXX + length(q0_RTJ)-1);
-e1 = q1_RTJ - q1_XXX(startidx_XXX:startidx_XXX + length(q1_RTJ)-1);
-
-[de0, dde0] = sgolay_derivatives(e0, time_XXX(startidx_XXX:end), 241, 3);
-[de1, dde1] = sgolay_derivatives(e1, time_XXX(startidx_XXX:end), 241, 3);
-
-figure(3) 
-subplot(2,2,1); plot(time_RTJ,e0);title('e0')
-subplot(2,2,2); plot(time_RTJ,e1);title('e1')
-subplot(2,2,3); plot(time_RTJ,de0);title('de0')
-subplot(2,2,4); plot(time_RTJ,de1);title('de1')
+% e0 = q0_RTJ - q0_XXX(startidx_XXX:startidx_XXX + length(q0_RTJ)-1);
+% e1 = q1_RTJ - q1_XXX(startidx_XXX:startidx_XXX + length(q1_RTJ)-1);
+% 
+% [de0, dde0] = sgolay_derivatives(e0, time_XXX(startidx_XXX:end), 241, 3);
+% [de1, dde1] = sgolay_derivatives(e1, time_XXX(startidx_XXX:end), 241, 3);
+% 
+% figure(3) 
+% subplot(2,2,1); plot(time_RTJ,e0);title('e0')
+% subplot(2,2,2); plot(time_RTJ,e1);title('e1')
+% subplot(2,2,3); plot(time_RTJ,de0);title('de0')
+% subplot(2,2,4); plot(time_RTJ,de1);title('de1')
 
 % figure(2)
 % subplot(1,2,1); plot(time_RTJ,dq0);
@@ -149,6 +149,129 @@ subplot(2,2,4); plot(time_RTJ,de1);title('de1')
 % title('sgolay fdq0')
 % subplot(1,2,2); plot(time_RTJ,fdq1(time_RTJ));
 % title('sgolay fdq1')
+
+%% Back of the Napkin tests
+
+% length of limb 1
+l1 = 0.122; 
+% length of limb 2
+l2 = 0.122; 
+epsilon = 1e-6; 
+% calculated spring constant of deformable force plate   
+k = 11.16; 
+% allowable max force on force plate - used for force-critical tasks
+Fmax = 11.16 * 1.6 / 100; 
+
+% Pulling base data open loop response  
+dat1 = 'plotting_data/ezloophw_closedloop_ros2_reserv_pneumatics_2026-3-5_141727.csv';
+dat1 = readtable(dat1, ...
+    'HeaderLines', 2, 'VariableNamingRule', 'preserve');
+time_dat1     = dat1.("Test time");
+startidx_dat1 = find(dat1.("u_t(0)"), 1, 'first');
+time_dat1     = time_dat1(startidx_dat1:end);
+%-time_dat1(startidx_dat1);
+theta_0_dat1  = dat1.theta_0;
+theta_0_dat1  = theta_0_dat1(startidx_dat1:end);
+theta_1_dat1  = dat1.theta_1;
+theta_1_dat1  = theta_1_dat1(startidx_dat1:end);
+q0_dat1  = deg2rad(theta_0_dat1*2);
+q1_dat1  = deg2rad(theta_1_dat1*2);
+[dq0_dat1, ddq0_dat1] = computeDerivatives(q0_dat1, time_dat1);
+[dq1_dat1, ddq1_dat1] = computeDerivatives(q1_dat1, time_dat1);
+% [dq0_dat1, ddq0_dat1] = sgolay_derivatives(q0_dat1, time_dat1, 241, 3);
+% [dq1_dat1, ddq1_dat1] = sgolay_derivatives(q1_dat1, time_dat1, 241, 3);
+q_dat1 = [q0_dat1 q1_dat1];
+dq_dat1 = [dq0_dat1 dq1_dat1];
+ddq_dat1 = [ddq0_dat1 ddq1_dat1];
+
+% Pulling data with dynamics controller  
+dat2 = 'plotting_data/ezloophw_closedloop_ros2_reserv_pneumatics_2026-3-5_152027.csv';
+dat2 = readtable(dat2, ...
+    'HeaderLines', 2, 'VariableNamingRule', 'preserve');
+time_dat2     = dat2.("Test time");
+startidx_dat2 = find(dat2.("u_t(0)"), 1, 'first');
+time_dat2     = time_dat2(startidx_dat2:end)-time_dat2(startidx_dat2);
+theta_0_dat2  = dat2.theta_0;
+theta_0_dat2  = theta_0_dat2(startidx_dat2:end);
+theta_1_dat2  = dat2.theta_1;
+theta_1_dat2  = theta_1_dat2(startidx_dat2:end);
+q0_dat2  = deg2rad(theta_0_dat2*2);
+q1_dat2  = deg2rad(theta_1_dat2*2);
+[dq0_dat2, ddq0_dat2] = computeDerivatives(q0_dat2, time_dat2);
+[dq1_dat2, ddq1_dat2] = computeDerivatives(q1_dat2, time_dat2);
+% [dq0_dat2, ddq0_dat2] = sgolay_derivatives(q0_dat2, time_dat2, 241, 3);
+% [dq1_dat2, ddq1_dat2] = sgolay_derivatives(q1_dat2, time_dat2, 241, 3);
+q_dat2 = [q0_dat2 q1_dat2];
+dq_dat2 = [dq0_dat2 dq1_dat2];
+ddq_dat2 = [ddq0_dat2 ddq1_dat2];
+
+% Pulling data with CBF
+dat3 = 'plotting_data/ezloophw_closedloop_ros2_reserv_pneumatics_2026-3-9_121724.csv';
+dat3 = readtable(dat3, ...
+    'HeaderLines', 2, 'VariableNamingRule', 'preserve');
+time_dat3     = dat3.("Test time");
+startidx_dat3 = find(dat3.("u_t(0)"), 1, 'first');
+time_dat3     = time_dat3(startidx_dat3:end)-time_dat3(startidx_dat3);
+theta_0_dat3  = dat3.theta_0;
+theta_0_dat3  = theta_0_dat3(startidx_dat3:end);
+theta_1_dat3  = dat3.theta_1;
+theta_1_dat3  = theta_1_dat3(startidx_dat3:end);
+q0_dat3  = deg2rad(theta_0_dat3*2);
+q1_dat3  = deg2rad(theta_1_dat3*2);
+[dq0_dat3, ddq0_dat3] = computeDerivatives(q0_dat3, time_dat3);
+[dq1_dat3, ddq1_dat3] = computeDerivatives(q1_dat3, time_dat3);
+% [dq0_dat3, ddq0_dat3] = sgolay_derivatives(q0_dat3, time_dat3, 241, 3);
+% [dq1_dat3, ddq1_dat3] = sgolay_derivatives(q1_dat3, time_dat3, 241, 3);
+q_dat3 = [q0_dat3 q1_dat3];
+dq_dat3 = [dq0_dat3 dq1_dat3];
+ddq_dat3 = [ddq0_dat3 ddq1_dat3];
+
+% Pulling data with CBF that blows up
+dat4 = 'plotting_data/ezloophw_closedloop_ros2_reserv_pneumatics_2026-3-10_135039.csv';
+dat4 = readtable(dat4, ...
+    'HeaderLines', 2, 'VariableNamingRule', 'preserve');
+time_dat4     = dat4.("Test time");
+startidx_dat4 = find(dat4.("u_t(0)"), 1, 'first');
+time_dat4     = time_dat4(startidx_dat4:end)-time_dat4(startidx_dat3);
+theta_0_dat4  = dat4.theta_0;
+theta_0_dat4  = theta_0_dat4(startidx_dat4:end);
+theta_1_dat4  = dat4.theta_1;
+theta_1_dat4  = theta_1_dat4(startidx_dat4:end);
+q0_dat4  = deg2rad(theta_0_dat4*2);
+q1_dat4  = deg2rad(theta_1_dat4*2);
+[dq0_dat4, ddq0_dat4] = computeDerivatives(q0_dat4, time_dat4);
+[dq1_dat4, ddq1_dat4] = computeDerivatives(q1_dat4, time_dat4);
+% [dq0_dat4, ddq0_dat4] = sgolay_derivatives(q0_dat4, time_dat4, 241, 3);
+% [dq1_dat4, ddq1_dat4] = sgolay_derivatives(q1_dat4, time_dat4, 241, 3);
+q_dat4 = [q0_dat4 q1_dat4];
+dq_dat4 = [dq0_dat4 dq1_dat4];
+ddq_dat4 = [ddq0_dat4 ddq1_dat4];
+
+% Tester data
+dat5 = 'plotting_data/ezloophw_closedloop_ros2_reserv_pneumatics_2026-3-10_162618.csv';
+
+
+% Comparison of states 
+figure(1); %'(Open-loop)Blue -> (CD)Red -> (CBF)Yellow'
+subplot(2,3,1);
+plot(time_dat1,q_dat1(:,1),LineWidth=3); hold on; plot(time_dat2,q_dat2(:,1),LineWidth=1.5); plot(time_dat3,q_dat3(:,1),LineWidth=1.5); plot(time_dat4,q_dat4(:,1),LineWidth=1.5); hold off; title('q0'); grid on;
+xlim([0 160])
+subplot(2,3,4); 
+plot(time_dat1,q_dat1(:,2),LineWidth=3); hold on; plot(time_dat2,q_dat2(:,2),LineWidth=1.5); plot(time_dat3,q_dat3(:,2),LineWidth=1.5); plot(time_dat4,q_dat4(:,2),LineWidth=1.5);hold off; title('q1'); grid on;
+xlim([0 160])
+subplot(2,3,2); 
+plot(time_dat1,dq_dat1(:,1),LineWidth=3); hold on; plot(time_dat2,dq_dat2(:,1),LineWidth=1.5); plot(time_dat3,dq_dat3(:,1),LineWidth=1.5); plot(time_dat4,dq_dat4(:,1),LineWidth=1.5); hold off; title('dq0'); grid on;
+xlim([0 160])
+subplot(2,3,5); 
+plot(time_dat1,dq_dat1(:,2),LineWidth=3); hold on; plot(time_dat2,dq_dat2(:,2),LineWidth=1.5); plot(time_dat3,dq_dat3(:,2),LineWidth=1.5); plot(time_dat4,dq_dat4(:,2),LineWidth=1.5); hold off; title('dq1'); grid on;
+xlim([0 160])
+subplot(2,3,3); 
+plot(time_dat1,ddq_dat1(:,1),LineWidth=3); hold on; plot(time_dat2,ddq_dat2(:,1),LineWidth=1.5); plot(time_dat3,ddq_dat3(:,1),LineWidth=1.5); plot(time_dat4,ddq_dat4(:,1),LineWidth=1.5); hold off; title('ddq0'); grid on;
+xlim([0 160])
+subplot(2,3,6); 
+plot(time_dat1,ddq_dat1(:,2),LineWidth=3); hold on; plot(time_dat2,ddq_dat2(:,2),LineWidth=1.5); plot(time_dat3,ddq_dat3(:,2),LineWidth=1.5); plot(time_dat4,ddq_dat4(:,2),LineWidth=1.5); hold off; title('ddq1'); grid on;
+xlim([0 160])
+legend('Open-Loop Response','Curvature Dynamics','Control Barrier Functions','CBF Fail');
 
 %% Used for solving for velocities and accelerations from reference trajectory 
 
@@ -180,4 +303,37 @@ function [d1, d2] = sgolay_derivatives(y, t, window_length, poly_order)
             d1(i) = polyval(dp, 0) / t_scale;
             d2(i) = polyval(ddp, 0) / (t_scale^2);
         end
+end
+
+function [dq, ddq] = computeDerivatives(q, t)
+% computeDerivatives  Compute first and second derivatives of a signal
+% using finite differences with non-uniform time steps.
+%
+% Inputs:
+%   q : Nx1 signal vector
+%   t : Nx1 time vector
+%
+% Outputs:
+%   dq  : Nx1 first derivative
+%   ddq : Nx1 second derivative
+
+N = length(q);
+
+dq  = zeros(N,1);
+ddq = zeros(N,1);
+
+% First derivative
+for i = 1:N-1
+    dt = t(i+1) - t(i);
+    dq(i) = (q(i+1) - q(i)) / dt;
+end
+dq(N) = dq(N-1);   % pad final element
+
+% Second derivative
+for i = 1:N-1
+    dt = t(i+1) - t(i);
+    ddq(i) = (dq(i+1) - dq(i)) / dt;
+end
+ddq(N) = ddq(N-1); % pad final element
+
 end
