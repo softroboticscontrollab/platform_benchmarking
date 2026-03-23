@@ -12,7 +12,7 @@ clear all; close all; clc;
 % indexs : time values useful for plotting multiple data files on the same
 % plot
 % ezloopdata_compare(data,doplot,stepResponse,indexs,sinResponse)
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % final tuning response for chamber 1
 dat = 'tuning/ezloophw_closedloop_ros2_reserv_pneumatics_2026-3-16_tuningC1.csv'; 
 ezloopdata_compare(dat, false, true);
@@ -40,63 +40,65 @@ dat = 'plotting_data/ezloophw_closedloop_ros2_reserv_pneumatics_2026-3-19_122338
 % Butterworth Filter Results
 dat = 'plotting_data/ezloophw_closedloop_ros2_reserv_pneumatics_2026-3-19_123309.csv';
 [time_butter, q_butter, dq_butter, ddq_butter, smooth_q_butter, smooth_dq_butter, smooth_ddq_butter, ~, ~] = ezloopdata_compare(dat, false, false, true, 0);
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %% Dynamics Controller response to Teach-and-Repeat 2
-
-% Teach-and-Repeat 2 trajectory
-dat = 'plotting_data/ezloophw_closedloop_ros2_reserv_pneumatics_2026-3-19_TnR2.csv'; 
-[time_TnR2, q_TnR2, dq_TnR2, ddq_TnR2, smooth_q_TnR2, smooth_dq_TnR2, smooth_ddq_TnR2, index_TnR2, ~] = ezloopdata_compare(dat, false, false, false, 0);
-
-% Inverse Dynamics Controller on TnR2 w/o forceplate
-dat = 'manuscript_data/ezloophw_closedloop_ros2_reserv_pneumatics_2026-3-20_TnR2CD1.csv'; 
-[time_CD1, q_CD1, dq_CD1, ddq_CD1, smooth_q_CD1, smooth_dq_CD1, smooth_ddq_CD1, ~, ~] = ezloopdata_compare(dat, false, false, false, index_TnR2);
-
-dat = 'manuscript_data/ezloophw_closedloop_ros2_reserv_pneumatics_2026-3-20_TnR2CD2.csv'; 
-[time_CD2, q_CD2, dq_CD2, ddq_CD2, smooth_q_CD2, smooth_dq_CD2, smooth_ddq_CD2, ~, ~] = ezloopdata_compare(dat, false, false, false, index_TnR2);
-
-dat = 'manuscript_data/ezloophw_closedloop_ros2_reserv_pneumatics_2026-3-20_TnR2CD3.csv'; 
-[time_CD3, q_CD3, dq_CD3, ddq_CD3, smooth_q_CD3, smooth_dq_CD3, smooth_ddq_CD3, ~, ~] = ezloopdata_compare(dat, false, false, false, index_TnR2);
-
-dat = 'manuscript_data/ezloophw_closedloop_ros2_reserv_pneumatics_2026-3-20_TnR2CD4.csv'; 
-[time_CD4, q_CD4, dq_CD4, ddq_CD4, smooth_q_CD4, smooth_dq_CD4, smooth_ddq_CD4, ~, ~] = ezloopdata_compare(dat, false, false, false, index_TnR2);
-
-dat = 'manuscript_data/ezloophw_closedloop_ros2_reserv_pneumatics_2026-3-20_TnR2CD5.csv'; 
-[time_CD5, q_CD5, dq_CD5, ddq_CD5, smooth_q_CD5, smooth_dq_CD5, smooth_ddq_CD5, ~, ~] = ezloopdata_compare(dat, false, false, false, index_TnR2);
-
-smooth_q_cells = {smooth_q_CD1, smooth_q_CD2, smooth_q_CD3, ...
-                  smooth_q_CD4, smooth_q_CD5};
-
-time_cells = {time_CD1, time_CD2, time_CD3, time_CD4, time_CD5};
-
-ezloopdata_safetyplotter(smooth_q_cells, time_cells, time_TnR2, smooth_q_TnR2, false)
-
-% Inverse Dynamics Controller on TnR2 w/ forceplate
-dat = 'manuscript_data/ezloophw_closedloop_ros2_reserv_pneumatics_2026-3-23_CDFP1.csv'; 
-[time_CDFP1, q_CDFP1, dq_CDFP1, ddq_CDFP1, smooth_q_CDFP1, smooth_dq_CDFP1, smooth_ddq_CDFP1, ~, rho0_CDFP1] = ezloopdata_compare(dat, false, false, false, index_TnR2);
- 
-dat = 'manuscript_data/ezloophw_closedloop_ros2_reserv_pneumatics_2026-3-23_CDFP2.csv'; 
-[time_CDFP2, q_CDFP2, dq_CDFP2, ddq_CDFP2, smooth_q_CDFP2, smooth_dq_CDFP2, smooth_ddq_CDFP2, ~, rho0_CDFP2] = ezloopdata_compare(dat, false, false, false, index_TnR2);
-
-dat = 'manuscript_data/ezloophw_closedloop_ros2_reserv_pneumatics_2026-3-23_CDFP3.csv'; 
-[time_CDFP3, q_CDFP3, dq_CDFP3, ddq_CDFP3, smooth_q_CDFP3, smooth_dq_CDFP3, smooth_ddq_CDFP3, ~, rho0_CDFP3] = ezloopdata_compare(dat, false, false, false, index_TnR2);
-
-dat = 'manuscript_data/ezloophw_closedloop_ros2_reserv_pneumatics_2026-3-23_CDFP4.csv'; 
-[time_CDFP4, q_CDFP4, dq_CDFP4, ddq_CDFP4, smooth_q_CDFP4, smooth_dq_CDFP4, smooth_ddq_CDFP4, ~, rho0_CDFP4] = ezloopdata_compare(dat, false, false, false, index_TnR2);
-
-dat = 'manuscript_data/ezloophw_closedloop_ros2_reserv_pneumatics_2026-3-23_CDFP5.csv'; 
-[time_CDFP5, q_CDFP5, dq_CDFP5, ddq_CDFP5, smooth_q_CDFP5, smooth_dq_CDFP5, smooth_ddq_CDFP5, ~, rho0_CDFP5] = ezloopdata_compare(dat, false, false, false, index_TnR2);
-
-smooth_q_cells = {smooth_q_CDFP1, smooth_q_CDFP2, smooth_q_CDFP3, ...
-                  smooth_q_CDFP4, smooth_q_CDFP5};
-
-rho_cells = {rho0_CDFP1, rho0_CDFP2, rho0_CDFP3, rho0_CDFP4, rho0_CDFP5};
-
-time_cells = {time_CDFP1, time_CDFP2, time_CDFP3, time_CDFP4, time_CDFP5};
-
-ezloopdata_safetyplotter(smooth_q_cells, time_cells, time_TnR2, smooth_q_TnR2, true, rho_cells)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% % Teach-and-Repeat 2 trajectory
+% dat = 'plotting_data/ezloophw_closedloop_ros2_reserv_pneumatics_2026-3-19_TnR2.csv'; 
+% [time_TnR2, q_TnR2, dq_TnR2, ddq_TnR2, smooth_q_TnR2, smooth_dq_TnR2, smooth_ddq_TnR2, index_TnR2, ~] = ezloopdata_compare(dat, false, false, false, 0);
+% 
+% % Inverse Dynamics Controller on TnR2 w/o forceplate
+% dat = 'manuscript_data/ezloophw_closedloop_ros2_reserv_pneumatics_2026-3-20_TnR2CD1.csv'; 
+% [time_CD1, q_CD1, dq_CD1, ddq_CD1, smooth_q_CD1, smooth_dq_CD1, smooth_ddq_CD1, ~, ~] = ezloopdata_compare(dat, false, false, false, index_TnR2);
+% 
+% dat = 'manuscript_data/ezloophw_closedloop_ros2_reserv_pneumatics_2026-3-20_TnR2CD2.csv'; 
+% [time_CD2, q_CD2, dq_CD2, ddq_CD2, smooth_q_CD2, smooth_dq_CD2, smooth_ddq_CD2, ~, ~] = ezloopdata_compare(dat, false, false, false, index_TnR2);
+% 
+% dat = 'manuscript_data/ezloophw_closedloop_ros2_reserv_pneumatics_2026-3-20_TnR2CD3.csv'; 
+% [time_CD3, q_CD3, dq_CD3, ddq_CD3, smooth_q_CD3, smooth_dq_CD3, smooth_ddq_CD3, ~, ~] = ezloopdata_compare(dat, false, false, false, index_TnR2);
+% 
+% dat = 'manuscript_data/ezloophw_closedloop_ros2_reserv_pneumatics_2026-3-20_TnR2CD4.csv'; 
+% [time_CD4, q_CD4, dq_CD4, ddq_CD4, smooth_q_CD4, smooth_dq_CD4, smooth_ddq_CD4, ~, ~] = ezloopdata_compare(dat, false, false, false, index_TnR2);
+% 
+% dat = 'manuscript_data/ezloophw_closedloop_ros2_reserv_pneumatics_2026-3-20_TnR2CD5.csv'; 
+% [time_CD5, q_CD5, dq_CD5, ddq_CD5, smooth_q_CD5, smooth_dq_CD5, smooth_ddq_CD5, ~, ~] = ezloopdata_compare(dat, false, false, false, index_TnR2);
+% 
+% smooth_q_cells = {smooth_q_CD1, smooth_q_CD2, smooth_q_CD3, ...
+%                   smooth_q_CD4, smooth_q_CD5};
+% 
+% time_cells = {time_CD1, time_CD2, time_CD3, time_CD4, time_CD5};
+% 
+% ezloopdata_safetyplotter(smooth_q_cells, time_cells, time_TnR2, smooth_q_TnR2, false)
+% 
+% % Inverse Dynamics Controller on TnR2 w/ forceplate
+% dat = 'manuscript_data/ezloophw_closedloop_ros2_reserv_pneumatics_2026-3-23_CDFP1.csv'; 
+% [time_CDFP1, q_CDFP1, dq_CDFP1, ddq_CDFP1, smooth_q_CDFP1, smooth_dq_CDFP1, smooth_ddq_CDFP1, ~, rho0_CDFP1] = ezloopdata_compare(dat, false, false, false, index_TnR2);
+% 
+% dat = 'manuscript_data/ezloophw_closedloop_ros2_reserv_pneumatics_2026-3-23_CDFP2.csv'; 
+% [time_CDFP2, q_CDFP2, dq_CDFP2, ddq_CDFP2, smooth_q_CDFP2, smooth_dq_CDFP2, smooth_ddq_CDFP2, ~, rho0_CDFP2] = ezloopdata_compare(dat, false, false, false, index_TnR2);
+% 
+% dat = 'manuscript_data/ezloophw_closedloop_ros2_reserv_pneumatics_2026-3-23_CDFP3.csv'; 
+% [time_CDFP3, q_CDFP3, dq_CDFP3, ddq_CDFP3, smooth_q_CDFP3, smooth_dq_CDFP3, smooth_ddq_CDFP3, ~, rho0_CDFP3] = ezloopdata_compare(dat, false, false, false, index_TnR2);
+% 
+% dat = 'manuscript_data/ezloophw_closedloop_ros2_reserv_pneumatics_2026-3-23_CDFP4.csv'; 
+% [time_CDFP4, q_CDFP4, dq_CDFP4, ddq_CDFP4, smooth_q_CDFP4, smooth_dq_CDFP4, smooth_ddq_CDFP4, ~, rho0_CDFP4] = ezloopdata_compare(dat, false, false, false, index_TnR2);
+% 
+% dat = 'manuscript_data/ezloophw_closedloop_ros2_reserv_pneumatics_2026-3-23_CDFP5.csv'; 
+% [time_CDFP5, q_CDFP5, dq_CDFP5, ddq_CDFP5, smooth_q_CDFP5, smooth_dq_CDFP5, smooth_ddq_CDFP5, ~, rho0_CDFP5] = ezloopdata_compare(dat, false, false, false, index_TnR2);
+% 
+% smooth_q_cells = {smooth_q_CDFP1, smooth_q_CDFP2, smooth_q_CDFP3, ...
+%                   smooth_q_CDFP4, smooth_q_CDFP5};
+% 
+% rho_cells = {rho0_CDFP1, rho0_CDFP2, rho0_CDFP3, rho0_CDFP4, rho0_CDFP5};
+% 
+% time_cells = {time_CDFP1, time_CDFP2, time_CDFP3, time_CDFP4, time_CDFP5};
+% 
+% ezloopdata_safetyplotter(smooth_q_cells, time_cells, time_TnR2, smooth_q_TnR2, true, rho_cells)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %% Dynamics Controller response to Teach-and-Repeat 3
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Teach-and-Repeat 3 trajectory
 dat = 'plotting_data/ezloophw_closedloop_ros2_reserv_pneumatics_2026-3-23_TnR3.csv'; 
 [time_TnR3, q_TnR3, dq_TnR3, ddq_TnR3, smooth_q_TnR3,smooth_dq_TnR3,smooth_ddq_TnR3, index_TnR3, ~] = ezloopdata_compare(dat, false, false, false, 0);
@@ -146,5 +148,32 @@ smooth_q_cells = {smooth_q_CDFP1, smooth_q_CDFP2, smooth_q_CDFP3, ...
 rho_cells = {rho0_CDFP1, rho0_CDFP2, rho0_CDFP3, rho0_CDFP4, rho0_CDFP5};
 
 time_cells = {time_CDFP1, time_CDFP2, time_CDFP3, time_CDFP4, time_CDFP5};
+
+ezloopdata_safetyplotter(smooth_q_cells, time_cells, time_TnR3, smooth_q_TnR3, true, rho_cells)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%% CBF Controller Response for High Conservative Case for Teach and Repeat 3
+
+dat = 'manuscript_data/ezloophw_closedloop_ros2_reserv_pneumatics_2026-3-23_TnR3CBFH1.csv'; 
+[time_H1, q_H1, dq_H1, ddq_H1, smooth_q_H1, smooth_dq_H1, smooth_ddq_H1, ~, rho0_H1] = ezloopdata_compare(dat, false, false, false, index_TnR3);
+ 
+dat = 'manuscript_data/ezloophw_closedloop_ros2_reserv_pneumatics_2026-3-23_TnR3CBFH2.csv'; 
+[time_H2, q_H2, dq_H2, ddq_H2, smooth_q_H2, smooth_dq_H2, smooth_ddq_H2, ~, rho0_H2] = ezloopdata_compare(dat, false, false, false, index_TnR3);
+
+dat = 'manuscript_data/ezloophw_closedloop_ros2_reserv_pneumatics_2026-3-23_TnR3CBFH3.csv'; 
+[time_H3, q_H3, dq_H3, ddq_H3, smooth_q_H3, smooth_dq_H3, smooth_ddq_H3, ~, rho0_H3] = ezloopdata_compare(dat, false, false, false, index_TnR3);
+
+dat = 'manuscript_data/ezloophw_closedloop_ros2_reserv_pneumatics_2026-3-23_TnR3CBFH4.csv'; 
+[time_H4, q_H4, dq_H4, ddq_H4, smooth_q_H4, smooth_dq_H4, smooth_ddq_H4, ~, rho0_H4] = ezloopdata_compare(dat, false, false, false, index_TnR3);
+
+dat = 'manuscript_data/ezloophw_closedloop_ros2_reserv_pneumatics_2026-3-23_TnR3CBFH5.csv'; 
+[time_H5, q_H5, dq_H5, ddq_H5, smooth_q_H5, smooth_dq_H5, smooth_ddq_H5, ~, rho0_H5] = ezloopdata_compare(dat, false, false, false, index_TnR3);
+
+smooth_q_cells = {smooth_q_H1, smooth_q_H2, smooth_q_H3, ...
+                  smooth_q_H4, smooth_q_H5};
+
+rho_cells = {rho0_H1, rho0_H2, rho0_H3, rho0_H4, rho0_H5};
+
+time_cells = {time_H1, time_H2, time_H3, time_H4, time_H5};
 
 ezloopdata_safetyplotter(smooth_q_cells, time_cells, time_TnR3, smooth_q_TnR3, true, rho_cells)

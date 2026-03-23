@@ -138,13 +138,20 @@ hold on
 p1 = plot(time_RTJ(startidx_RTJ:end),q0_RTJ(startidx_RTJ:end),LineWidth=2,Color=[0.25 0.25 0.25]);
 p2 = plot(time_RTJ(startidx_RTJ:end),q0_updwo_mean(2:end),LineWidth=1,Color=[0 0.604 0.192]);
 
-lgd = legend([p1 p2],{'Reference Trajectory','Achieved Trajectory'},Location='northeast');    
-lgd.FontSize = 15;
+lgd = legend([p1 p2],{'reference $q_d$','actual $q$'},Location='southwest');    
+lgd.FontSize = 8;
 
-ylabel('q_0 (radians)','FontSize',14) 
+ylabel('$q0$ (rads)') 
 % xlabel('Time (s)','FontSize',14) 
 
 title('Tracking with PD w/o Force Plate')
+grid on;
+
+lgd.Units = 'normalized';       % Make position relative to axes
+pos1 = lgd.Position;
+pos1(1) = pos1(1) - 0.02;         % Move right
+pos1(2) = pos1(2) - 0.02;         % Move up
+lgd.Position = pos1;
 
 hold off 
 
@@ -164,15 +171,37 @@ hold on
 p1 = plot(time_RTJ(startidx_RTJ:end),q1_RTJ(startidx_RTJ:end),LineWidth=2,Color=[0.25 0.25 0.25]);
 p2 = plot(time_RTJ(startidx_RTJ:end),q1_updwo_mean(2:end),LineWidth=1,Color=[0.188 0.361 0.92]);
 
-lgd = legend([p1 p2],{'Reference Trajectory','Achieved Trajectory'},Location='northeast');    
-lgd.FontSize = 15;
+lgd = legend([p1 p2],{'reference $q_d$','actual $q$'},Location='southwest');    
+lgd.FontSize = 8;
 
-ylabel('q_1 (radians)','FontSize',14) 
-xlabel('Time (s)','FontSize',14) 
+ylabel('$q1$ (rads)') 
+xlabel('Time (s)') 
 
 % title('Tracking with PD+')
 
 hold off 
+
+hw_ratio = 1.1;
+single_column = true;
+picturewidth_singlecolumn = 8.6 ; % cm
+
+set(findall(Plot1,'-property','Interpreter'), 'Interpreter', 'latex')
+set(findall(Plot1,'-property','TickLabelInterpreter'), 'TickLabelInterpreter', 'latex')
+set(findall(Plot1,'-property','Box'), 'Box', 'off')
+set(Plot1, 'Units', 'centimeters', ...
+        'Position', [3 1 picturewidth_singlecolumn hw_ratio * picturewidth_singlecolumn]);
+grid on;
+
+lgd.Units = 'normalized';       % Make position relative to axes
+pos1 = lgd.Position;
+pos1(1) = pos1(1) - 0.02;         % Move right
+pos1(2) = pos1(2) - 0.02;         % Move up
+lgd.Position = pos1;
+
+fname = 'PD_tracking';
+% exportgraphics(th, strcat(fname, '.eps'), 'ContentType', 'vector');
+% exportgraphics(th, strcat(fname, '.pdf'), 'ContentType', 'vector');
+exportgraphics(Plot1, strcat(fname, '.png'), 'ContentType', 'vector');
 
 
 %% Range values of q = [q0,q1] for PD w force plate
