@@ -7,10 +7,14 @@ T = 40;
 
 phase = mod(t, T);
 
-if phase < T/2
-    u = [70;0];
-else
-    u = [0;-70];
-end
+% if phase < T/2
+%     u = [0;-70];
+% else
+%     u = [0;0];
+% end
+
+% u = [79.8727;79.8756]; % location of forceplate in paper experiments
+
+u = [0;0]; % useful for gathering data for teach_and_repeat
 
 end

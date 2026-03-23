@@ -1,18 +1,25 @@
 classdef RobotStateFilter < handle
     properties (Access = private)
         FilterObj
+        VelFilterObj 
         numStates
     end
     
     methods
         function obj = RobotStateFilter(dt, sigma, halfWidthSigma, numStates)
             % Store number of states (default to 2 if not provided)
-            if nargin < 4, numStates = 2; end
+            if nargin < 4
+                numStates = 2; 
+            end
+
             obj.numStates = numStates;
             
             % Initialize the core Gaussian filter with your custom settings
-            %
             obj.FilterObj = RealTimeGaussFilter(dt, sigma, halfWidthSigma);
+            % velocity filters (one per state)
+            for i = 1:numStates
+                obj.VelFilterObj{i} = RealTimeGaussFilter(dt, sigma, halfWidthSigma-2);
+            end           
         end
         
         function [q_now, dq_now] = process(obj, dataWindow)
@@ -35,7 +42,8 @@ classdef RobotStateFilter < handle
                 end
                 
                 q_now(i) = s;
-                dq_now(i) = ds;
+                [dq_filtered, ~] = obj.VelFilterObj{i}.step(ds);
+                dq_now(i) = dq_filtered;
             end
         end
     end

@@ -73,9 +73,12 @@ l2 = 0.122;
 % k1 = 137.75020; k2 = 213.18483;
 
 %%%% new calibration
-k1 = 145.00178; k2 = 221.19751;
+% k1 = 145.00178; k2 = 221.19751;
 
-damping = 3; %3.5 
+%%%% new calibration 2026 mar 20 - post butterworth online smoothing
+k1 = 223.82375; k2 = 203.92268;
+
+damping = 7; %3.5 
 % damping = 5.0;
 % damping = 10.0; % A larger damping constant means that the simulation has less motion under a change in u.
 % damping = 20.0; %...but a larger damping for the model means that the
@@ -94,12 +97,12 @@ c.l2 = l2;
 c.g = 9.81; % not used -- to do, clean up constants
 
 % constants for the nominal controller: sinusoids
-c.amp1 = 160; % amp1 = 45 for CBF paper 80
-c.amp2 = 160; % amp2 = 45 for CBF paper 80
+c.amp1 = 100; % amp1 = 45 for CBF paper 80
+c.amp2 = 100; % amp2 = 45 for CBF paper 80
 % c.amp1 = 45; % April 2025 used 45
 % c.amp2 = 45; % April 2025 used 45
-per1 = 140; % per1 = 60 for CBF paper 100
-per2 = 140; % per2 = 60 for CBF paper 100
+per1 = 200; % per1 = 60 for CBF paper 100
+per2 = 200; % per2 = 60 for CBF paper 100
 c.freq1 = 1/per1;
 c.freq2 = 1/per2;
 c.shift1 = 0;
@@ -131,7 +134,7 @@ k_env = 11.16;
 % aE = 1.0; bE = 1.0; gam = 1.0; % high
 
 % aE = 1; bE = 0.5; gam = 0.0001;
-aE = 0.3; bE = 0.3; gam = 0.3;
+aE = 0.1; bE = 0.1; gam = 0.1;
 p_des = [deg2rad(30); deg2rad(30)];  
 
 c.k_env = k_env;
@@ -150,13 +153,13 @@ c.Kd_ct = Kd_ct;
 % which controller to choose. This is the combined controller, both nom and
 % safe supervisor.
 
-% ctrlr = @u_softcbf_combined;
-ctrlr = @u_computed_torque_control;
 % ctrlr = @u_Pressuretunner;
 
-%u_pd_control_trajectory
-%u_computed_torque_control
-%u_sim_traj
+% ctrlr = @u_pd_control_trajectory;
+
+% ctrlr = @u_computed_torque_control;
+
+ctrlr = @u_softcbf_combined;
 
 %% Initialize ROS2 nodes for the MATLAB side
 % we are this node for sending control commands
@@ -169,13 +172,18 @@ matlabSubNode = ros2node(matlabSubNodeName);
 %% --- Setup: Publisher to controller commands topic ---
 
 pubWait = 2;
-cmdtopic = '/cmd_u_t';
+cmdtopic = '/u_t';
 
 disp("Starting the publisher, waiting " + string(pubWait) + " seconds...");
 
-controlPub = ros2publisher(matlabPubNode, cmdtopic, 'std_msgs/Float64MultiArray');
+controlPub = ros2publisher(matlabPubNode, cmdtopic, 'std_msgs/Float64MultiArray','History', 'keeplast', 'Depth', 1);
 controlMsg = ros2message(controlPub);
 pause(pubWait); %wait for some time to register publisher on the network
+
+% Define the extra topics we want to send to python script e.g. filtered
+% bending angles and its derivatives
+extraTopics = {'smoothed_q', 'smoothed_dq', 'smoothed_ddq'};
+timerHandles.publishers = struct(); % Sub-struct to hold publishers
 
 %% --- Setup: Subscriber to /bending_angles ---
 
@@ -190,6 +198,7 @@ global prevBendingVec; % for velocities finite difference
 global prevdBendingVec; 
 global n_smooth_prev_velocity; % velocity smoothing
 global dBendingVec; % the calculated velocity finite difference
+global ddBendingVec; % the calculated acceleration finite difference 
 
 global q_storage; % storing values for debugging 
 global dq_storage; % storing values for debugging
@@ -204,9 +213,8 @@ prevRxTime = timeatstart;
 % stored as row vectors for ROS2
 bendingVec = zeros(1,2);
 n_smooth_prev_velocity = 10;
-prevBendingVec = zeros(n_smooth_prev_velocity, 2); % now storing the last ten samples.
 dBendingVec = zeros(1,2);
-prevdBendingVec = zeros(n_smooth_prev_velocity, 2);
+ddBendingVec = zeros(1,2);
 
 q_storage = zeros(1,2);
 dq_storage = zeros(1,2);
@@ -214,7 +222,7 @@ dq_storage = zeros(1,2);
 disp('Attempting to start the subscriber...')
 while ~subStarted
     try
-        bendingSub = ros2subscriber(matlabSubNode, subtopic, {@ezloophwROS2BendingAngleCallback, rxCallbackHandles});
+        bendingSub = ros2subscriber(matlabSubNode, subtopic, {@ezloophwROS2BendingAngleCallback, rxCallbackHandles},'History', 'keeplast', 'Depth', 1);
         subStarted = 1;
     catch
         disp("ERROR! You need to start the publisher in python for topic:");
@@ -241,8 +249,15 @@ timerHandles.c = c;
 timerHandles.ctrlr = ctrlr;
 
 % timerHandles.timeatstart = ros2time(matlabPubNode, 'now');
+for i = 1:length(extraTopics)
+    topicName = extraTopics{i};
+    % Store publisher and message in the handles struct
+    timerHandles.publishers.(topicName).pub = ros2publisher(matlabPubNode, topicName, 'std_msgs/Float64MultiArray','History', 'keeplast', 'Depth', 1);
+    timerHandles.publishers.(topicName).msg = ros2message(timerHandles.publishers.(topicName).pub);
+end
+
 timerHandles.timeatstart = double(ros2time(matlabPubNode,'now').sec) + double(ros2time(matlabPubNode,'now').nanosec) * 1e-9;
-simTimer = ezloophwROS2Timer(pubRate, {@ezloophwROS2ControlTimer,timerHandles});
+simTimer = ezloophwROS2Timer(pubRate, {@ezloophwROS2ControlTimerV2,timerHandles});
 
 %% Main loop. Just waits until user clicks q in window,
 
