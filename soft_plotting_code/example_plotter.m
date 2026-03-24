@@ -33,6 +33,28 @@ ezloopdata_compare(dat, false, true);
 dat = 'plotting_data/ezloophw_closedloop_ros2_reserv_pneumatics_2026-3-19_141950.csv'; 
 [time_cal, q_cal, dq_cal, ddq_cal, smooth_q_cal, smooth_dq_cal, smooth_ddq_cal, calib_start,~] = ezloopdata_compare(dat, false, false, true, 0);
 
+dat = 'plotting_data/ezloophw_closedloop_ros2_reserv_pneumatics_2026-3-24_TrackCalib1.csv'; 
+[time_tra1, q_tra1, dq_tra1, ddq_tra1, smooth_q_tra1, smooth_dq_tra1, smooth_ddq_tra1,~,~] = ezloopdata_compare(dat, false, false, true, calib_start);
+
+dat = 'plotting_data/ezloophw_closedloop_ros2_reserv_pneumatics_2026-3-24_TrackCalib2.csv'; 
+[time_tra2, q_tra2, dq_tra2, ddq_tra2, smooth_q_tra2, smooth_dq_tra2, smooth_ddq_tra2,~,~] = ezloopdata_compare(dat, false, false, true, calib_start);
+
+dat = 'plotting_data/ezloophw_closedloop_ros2_reserv_pneumatics_2026-3-24_TrackCalib3.csv'; 
+[time_tra3, q_tra3, dq_tra3, ddq_tra3, smooth_q_tra3, smooth_dq_tra3, smooth_ddq_tra3,~,~] = ezloopdata_compare(dat, false, false, true, calib_start);
+
+dat = 'plotting_data/ezloophw_closedloop_ros2_reserv_pneumatics_2026-3-24_TrackCalib4.csv'; 
+[time_tra4, q_tra4, dq_tra4, ddq_tra4, smooth_q_tra4, smooth_dq_tra4, smooth_ddq_tra4,~,~] = ezloopdata_compare(dat, false, false, true, calib_start);
+
+dat = 'plotting_data/ezloophw_closedloop_ros2_reserv_pneumatics_2026-3-24_TrackCalib5.csv'; 
+[time_tra5, q_tra5, dq_tra5, ddq_tra5, smooth_q_tra5, smooth_dq_tra5, smooth_ddq_tra5,~,~] = ezloopdata_compare(dat, false, false, true, calib_start);
+
+smooth_q_cells = {smooth_q_tra1, smooth_q_tra2, smooth_q_tra3, ...
+                  smooth_q_tra4, smooth_q_tra5};
+
+time_cells = {time_tra1, time_tra2, time_tra3, time_tra4, time_tra5};
+
+ezloopdata_safetyplotter(smooth_q_cells, time_cells, time_cal, smooth_q_cal, false)
+
 % AsymGaussian Filter Results 
 dat = 'plotting_data/ezloophw_closedloop_ros2_reserv_pneumatics_2026-3-19_122338.csv';
 [time_asym, q_asym, dq_asym, ddq_asym, smooth_q_asym, smooth_dq_asym, smooth_ddq_asym, ~, ~] = ezloopdata_compare(dat, false, false, true, 0);

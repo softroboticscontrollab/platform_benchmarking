@@ -134,7 +134,9 @@ k_env = 11.16;
 % aE = 1.0; bE = 1.0; gam = 1.0; % high
 
 % aE = 1; bE = 0.5; gam = 0.0001;
-aE = 0.1; bE = 0.1; gam = 0.1;
+aE = 2; bE = 2; gam = 0.05;
+% Use the following for medium conservativeness aE = 2; bE = 2; gam = 0.05
+% Use the following for high conservativeness aE = 0.1; bE = 0.1; gam = 0.1
 p_des = [deg2rad(30); deg2rad(30)];  
 
 c.k_env = k_env;
@@ -157,9 +159,9 @@ c.Kd_ct = Kd_ct;
 
 % ctrlr = @u_pd_control_trajectory;
 
-% ctrlr = @u_computed_torque_control;
+ctrlr = @u_computed_torque_control;
 
-ctrlr = @u_softcbf_combined;
+% ctrlr = @u_softcbf_combined;
 
 %% Initialize ROS2 nodes for the MATLAB side
 % we are this node for sending control commands

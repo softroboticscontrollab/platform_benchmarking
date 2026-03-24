@@ -87,10 +87,12 @@ function [qd, dqd, ddqd] = desired_traj_sine(t)
     persistent Fq1 Fq2 Fdq1 Fdq2 Fddq1 Fddq2 tmin tmax
 % ezloophw_closedloop_ros2_reserv_pneumatics_2026-1-20_153443
     if isempty(Fq1)
-        data = readtable('ezloophw_closedloop_ros2_reserv_pneumatics_2026-3-23_TnR3.csv', ...
-        'HeaderLines', 2, 'VariableNamingRule', 'preserve');
+%         data = readtable('ezloophw_closedloop_ros2_reserv_pneumatics_2026-3-23_TnR3.csv', ...
+%         'HeaderLines', 2, 'VariableNamingRule', 'preserve'); % Change
+%         this to desired reference trajectory
+        data = readtable('ezloophw_closedloop_ros2_reserv_pneumatics_2026-3-19_CalibrationRun.csv', ...
+        'HeaderLines', 2, 'VariableNamingRule', 'preserve'); % Use this to test against calibration data        
         data(1,:) = [];
-
         time_data = data.("Test time");
         time_data = time_data(:);
         time_data = time_data - time_data(1);
