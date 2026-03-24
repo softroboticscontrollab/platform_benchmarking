@@ -199,7 +199,7 @@ try
         data.ddq_1(startidx:endidx)
     ];
 catch
-    disp('ddq data not under name data.ddq');
+    %disp('ddq data not under name data.ddq');
 end
 try
     smooth_ddq = [
@@ -207,7 +207,7 @@ try
         data.smoothed_ddq_1(startidx:endidx)
     ];
 catch
-    disp('ddq data not under name data.smoothed_ddq');
+    %disp('ddq data not under name data.smoothed_ddq');
 end
 
 %% Plot comparison (optional)
