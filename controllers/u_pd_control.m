@@ -5,7 +5,6 @@ function u = u_pd_control(x, c, t)
 %   x = [q1; q2; dq1; dq2]
 %   c.Kp, c.Ki, c.Kd  (2x1 or scalar gains)
 %   c.q_des           (2x1 desired joint position)
-%   c.dt              (time step)
 %   t = current time (unused, but kept for interface consistency)
 
 q  = x(1:2);

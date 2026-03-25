@@ -210,6 +210,8 @@ catch
     %disp('ddq data not under name data.smoothed_ddq');
 end
 
+%% Tip position if necessary 
+
 %% Plot comparison (optional)
 
 if doPlot

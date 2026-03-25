@@ -42,47 +42,13 @@ addpath(genpath(constraintsdir));
 
 m2 = 0.13; % kg
 m6 = 0.13;
-l1 = 0.122;
+l1 = 0.122; % m
 l2 = 0.122;
 
-%%% from Juan/Akua as of 2025-07-24
-% damping = 10.0;
-% k1 = 130.85249; 
-% k2 = 165.12965;
-% damping = 3.5; % 3.5
-% k1 = 75.41558; 
-% k2 = 112.84726; 
+%%%% new calibration 2026 mar 25 - post butterworth online smoothing
+k1 = 143.20623; k2 = 245.96992;
 
-% most recent?
-% k1 = 69.48618;
-% k2 = 89.03760;
-
-%%% from Drew recalibration 2025-07-26+
-% k1 = 75.5; k2 = 128;
-
-%%% from Akua relacibration 2025-10-27
-%k1 = 147.55762; k2 = 253.56177;
-
-%%% from Akua recalibration with big t ags 2026-02-13
-% k1 = 137.20584; k2 = 239.44695;
-
-%%% from akua recab 2026-03-2
-% k1 = 148.26985; k2 = 241.11158;
-
-%%% from akua recab again 2026-03-4
-% k1 = 137.75020; k2 = 213.18483;
-
-%%%% new calibration
-% k1 = 145.00178; k2 = 221.19751;
-
-%%%% new calibration 2026 mar 20 - post butterworth online smoothing
-k1 = 223.82375; k2 = 203.92268;
-
-damping = 7; %3.5 
-% damping = 5.0;
-% damping = 10.0; % A larger damping constant means that the simulation has less motion under a change in u.
-% damping = 20.0; %...but a larger damping for the model means that the
-% CBF-based QP predicts less motion than actually occurs.
+damping = 5; 
 
 tol = 10^4; % numerical tolerance for instability: if f(x) is greater than this, in any element, assume our simulation has encountered a big issue and stop integrating
 
@@ -94,15 +60,13 @@ c.k2 = k2;
 c.tol = tol;
 c.l1 = l1;
 c.l2 = l2;
-c.g = 9.81; % not used -- to do, clean up constants
+c.g = 9.81; 
 
 % constants for the nominal controller: sinusoids
-c.amp1 = 100; % amp1 = 45 for CBF paper 80
-c.amp2 = 100; % amp2 = 45 for CBF paper 80
-% c.amp1 = 45; % April 2025 used 45
-% c.amp2 = 45; % April 2025 used 45
-per1 = 200; % per1 = 60 for CBF paper 100
-per2 = 200; % per2 = 60 for CBF paper 100
+c.amp1 = 100; 
+c.amp2 = 100; 
+per1 = 200; 
+per2 = 200; 
 c.freq1 = 1/per1;
 c.freq2 = 1/per2;
 c.shift1 = 0;
@@ -110,34 +74,14 @@ c.shift2 = 0;
 c.u_limit = 250;
 
 % constants for the CBF-based supervisor
-F_max = 0.16; % shouldn't this be 0.1786? 11.16*1.6/1000
+F_max = 11.16*1.6/1000;
 k_env = 11.16;
 
-%%% Juan/Akua constants as of 2025-07-24
-% aE = 5; % 0.2 1 2 20
-% bE = 5; % 0.2 1 2 20
-% gam = 5; % 0.2 1 2 20
+aE = 0.1; bE = 0.1; gam = 0.05;
+% Use for medium conservativeness aE = 2; bE = 2; gam = 0.05
+% Use for high conservativeness aE = 0.1; bE = 0.1; gam = 0.05
 
-% aE = 10; % even more conservative
-% aE = 1050;
-% bE = 1050;
-% gam = 2000;
-% k_env = 10;
-% F_max = 20;
-
-%%% Comparison with April 2025 constants
-% aE = 2.0; bE = 2.0; gam = 2.0; % medium from the April 2025 paper
-% aE = 0.2; bE = 0.2; gam = 0.2; % high from the April 2025 paper
-
-% aE = 20.0; bE = 20.0; gam = 20.0; % low conservative. Fixed as of 2025-07-26
-% aE = 5.0; bE = 5.0; gam = 5.0; % medium
-% aE = 1.0; bE = 1.0; gam = 1.0; % high
-
-% aE = 1; bE = 0.5; gam = 0.0001;
-aE = 2; bE = 2; gam = 0.05;
-% Use the following for medium conservativeness aE = 2; bE = 2; gam = 0.05
-% Use the following for high conservativeness aE = 0.1; bE = 0.1; gam = 0.1
-p_des = [deg2rad(30); deg2rad(30)];  
+p_des = [deg2rad(20); -1*deg2rad(20)];  
 
 c.k_env = k_env;
 c.F_max = F_max;
@@ -146,8 +90,8 @@ c.bE = bE;
 c.gam = gam;
 
 %% PID Controller Setups 
-Kp = [160; 160]; Kd = [1; 1]; 
-Kp_ct = [5;5]; Kd_ct = [1;1];
+Kp = [300; 300]; Kd = [15; 15]; 
+Kp_ct = [5; 5]; Kd_ct = [1;1];
 c.p_des = p_des; c.Kp = Kp; 
 c.Kd = Kd; c.Kp_ct = Kp_ct; 
 c.Kd_ct = Kd_ct; 
@@ -157,9 +101,11 @@ c.Kd_ct = Kd_ct;
 
 % ctrlr = @u_Pressuretunner;
 
+ctrlr = @u_pd_control;
+
 % ctrlr = @u_pd_control_trajectory;
 
-ctrlr = @u_computed_torque_control;
+% ctrlr = @u_computed_torque_control;
 
 % ctrlr = @u_softcbf_combined;
 
