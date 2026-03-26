@@ -90,7 +90,7 @@ c.bE = bE;
 c.gam = gam;
 
 %% PID Controller Setups 
-Kp = [300; 300]; Kd = [15; 15]; 
+Kp = [212; 280]; Kd = [20; 22]; 
 Kp_ct = [5; 5]; Kd_ct = [1;1];
 c.p_des = p_des; c.Kp = Kp; 
 c.Kd = Kd; c.Kp_ct = Kp_ct; 
@@ -101,9 +101,9 @@ c.Kd_ct = Kd_ct;
 
 % ctrlr = @u_Pressuretunner;
 
-ctrlr = @u_pd_control;
+% ctrlr = @u_pd_control;
 
-% ctrlr = @u_pd_control_trajectory;
+ctrlr = @u_pd_control_trajectory;
 
 % ctrlr = @u_computed_torque_control;
 

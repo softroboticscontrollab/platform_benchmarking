@@ -13,8 +13,8 @@ phase = mod(t, T);
 %     u = [0;0];
 % end
 
-% u = [79.8727;79.8756]; % location of forceplate in paper experiments
+u = [0;0];
 
-u = [52.0741;44.9907]; % useful for gathering data for teach_and_repeat
+% u = [52.0741;44.9907]; % useful for gathering data for teach_and_repeat
 
 end
