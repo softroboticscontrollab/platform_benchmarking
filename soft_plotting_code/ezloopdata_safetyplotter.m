@@ -1,17 +1,21 @@
-function ezloopdata_safetyplotter(smooth_q_cells, time_cells, time_ref, q_ref, includeRho, rho_cells)
+function out = ezloopdata_safetyplotter( ...
+    smooth_q_cells, time_cells, time_ref, q_ref, includeRho, rho_cells, doPlot)
 
 % plotCDFPTracking
-% Computes mean and ±2σ envelopes for multiple experiments and plots them.
-%
-% INPUTS
-% smooth_q_cells : cell array {N} each [T x 2] matrix (q0,q1)
-% time_cells     : cell array {N} each [T x 1]
-% time_ref       : reference time vector
-% q_ref          : reference trajectory
-% includeRho     : boolean flag (true = plot rho, false = omit)
-% rho_cells      : cell array {N} each [T x 1] (required only if includeRho=true)
+% Computes mean and ±2σ envelopes for multiple experiments and optionally plots them.
 
 nRuns = length(smooth_q_cells);
+
+%% Initialize output struct
+out = struct();
+out.meta.nRuns = nRuns;
+out.meta.includeRho = includeRho;
+out.meta.doPlot = doPlot;
+
+% Preallocate graphics handles so they always exist
+out.fig = [];
+out.ax = struct();
+out.plotHandles = struct();
 
 %% Determine common endpoint
 lengths = zeros(nRuns,1);
@@ -28,9 +32,11 @@ if includeRho
 end
 
 % Include reference trajectory lengths
-refLength = min(length(time_ref), length(q_ref));
+refLength = min(length(time_ref), size(q_ref,1));
 
 endpoint = min([lengths; refLength]);
+
+out.meta.endpoint = endpoint;
 
 %% Assemble matrices
 q0_all = zeros(endpoint,nRuns);
@@ -40,6 +46,10 @@ for i = 1:nRuns
     q0_all(:,i) = smooth_q_cells{i}(1:endpoint,1);
     q1_all(:,i) = smooth_q_cells{i}(1:endpoint,2);
 end
+
+%% Store raw matrices
+out.raw.q0_all = q0_all;
+out.raw.q1_all = q1_all;
 
 %% Statistics for q0 and q1
 q0_mu = mean(q0_all,2);
@@ -53,6 +63,17 @@ q0_lower = q0_mu - 2*q0_sigma;
 
 q1_upper = q1_mu + 2*q1_sigma;
 q1_lower = q1_mu - 2*q1_sigma;
+
+%% Store q statistics
+out.q0.mu = q0_mu;
+out.q0.sigma = q0_sigma;
+out.q0.upper = q0_upper;
+out.q0.lower = q0_lower;
+
+out.q1.mu = q1_mu;
+out.q1.sigma = q1_sigma;
+out.q1.upper = q1_upper;
+out.q1.lower = q1_lower;
 
 %% Rho statistics (only if requested)
 if includeRho
@@ -69,94 +90,149 @@ if includeRho
     rho_upper = rho_mu + 2*rho_sigma;
     rho_lower = rho_mu - 2*rho_sigma;
 
+    %% Store rho
+    out.raw.rho_all = rho_all;
+
+    out.rho.mu = rho_mu;
+    out.rho.sigma = rho_sigma;
+    out.rho.upper = rho_upper;
+    out.rho.lower = rho_lower;
+
 end
 
 %% Time vector
 t = time_cells{1}(1:endpoint);
+t_ref = time_ref(1:endpoint);
 
-%% Determine number of subplots
+out.time = t;
+out.time_ref = t_ref;
+
+%% Store reference
+out.reference.q = q_ref(1:endpoint,:);
+
+%% (Optional) store original cells for debugging
+out.raw.smooth_q_cells = smooth_q_cells;
+out.raw.time_cells = time_cells;
+
 if includeRho
-    nSub = 3;
-else
-    nSub = 2;
+    out.raw.rho_cells = rho_cells;
 end
 
-figure
+%% X-axis limit based on actual plotted data
+xEnd = max([t(end), t_ref(end)]);
+out.meta.xlim = [t(1), xEnd];
 
-%% q0 subplot
-subplot(nSub,1,1)
+%% =========================
+%% Plotting (conditional)
+%% =========================
+if doPlot
 
-fill([t; flipud(t)], ...
-     [q0_upper; flipud(q0_lower)], ...
-     [0 0.604 0.192], ...
-     'EdgeColor','none','FaceAlpha',0.2);
-hold on
+    if includeRho
+        nSub = 3;
+    else
+        nSub = 2;
+    end
 
-p1 = plot(time_ref(1:endpoint), q_ref(1:endpoint,1), ...
-          'LineWidth',2,'Color',[0.25 0.25 0.25]);
+    out.fig = figure;
 
-p2 = plot(t, q0_mu, ...
-          'LineWidth',1,'Color',[0 0.604 0.192]);
+    %% q0 subplot
+    out.ax.q0 = subplot(nSub,1,1);
 
-legend([p1 p2],{'Reference Trajectory','Achieved Trajectory'}, ...
-       'Location','northeast','FontSize',15);
-
-ylabel('q_0 (radians)','FontSize',14)
-title('Tracking with CD with Force Plate')
-
-hold off
-
-
-%% q1 subplot
-subplot(nSub,1,2)
-
-fill([t; flipud(t)], ...
-     [q1_upper; flipud(q1_lower)], ...
-     [0.188 0.361 0.92], ...
-     'EdgeColor','none','FaceAlpha',0.2);
-hold on
-
-p1 = plot(time_ref(1:endpoint), q_ref(1:endpoint,2), ...
-          'LineWidth',2,'Color',[0.25 0.25 0.25]);
-
-p2 = plot(t, q1_mu, ...
-          'LineWidth',1,'Color',[0.188 0.361 0.92]);
-
-legend([p1 p2],{'Reference Trajectory','Achieved Trajectory'}, ...
-       'Location','northeast','FontSize',15);
-
-ylabel('q_1 (radians)','FontSize',14)
-xlabel('Time (s)','FontSize',14)
-
-hold off
-
-
-%% rho subplot (optional)
-if includeRho
-
-    subplot(3,1,3)
-
-    rho_max = zeros(endpoint,1);
-
-    fill([t; flipud(t)], ...
-         [rho_upper; flipud(rho_lower)], ...
+    out.plotHandles.q0.band = fill([t; flipud(t)], ...
+         [q0_upper; flipud(q0_lower)], ...
          [0.188 0.361 0.92], ...
          'EdgeColor','none','FaceAlpha',0.2);
     hold on
 
-    p1 = plot(time_ref(1:endpoint), rho_max, ...
-              '--','LineWidth',2,'Color','red');
+    out.plotHandles.q0.reference = plot(t_ref, q_ref(1:endpoint,1), ...
+              'LineWidth',2,'Color',[0.25 0.25 0.25]);
 
-    p2 = plot(t, rho_mu, ...
+    out.plotHandles.q0.mean = plot(t, q0_mu, ...
               'LineWidth',1,'Color',[0.188 0.361 0.92]);
 
-    legend([p1 p2],{'Minimum Rho','Calculated Rho'}, ...
-           'Location','northeast','FontSize',15);
+    out.plotHandles.q0.legend = legend( ...
+        [out.plotHandles.q0.reference, out.plotHandles.q0.mean], ...
+        {'Simulated','Achieved'}, ...
+        'Location','northeast','FontSize',12);
 
-    ylabel('Rho','FontSize',14)
+    ylabel('q_0 (radians)','FontSize',14)
     xlabel('Time (s)','FontSize',14)
+    title('Tracking with CD with Force Plate')
+
+    xlim(out.ax.q0, out.meta.xlim)
 
     hold off
+
+
+    %% q1 subplot
+    out.ax.q1 = subplot(nSub,1,2);
+
+    out.plotHandles.q1.band = fill([t; flipud(t)], ...
+         [q1_upper; flipud(q1_lower)], ...
+         [0.188 0.361 0.92], ...
+         'EdgeColor','none','FaceAlpha',0.2);
+    hold on
+
+    out.plotHandles.q1.reference = plot(t_ref, q_ref(1:endpoint,2), ...
+              'LineWidth',2,'Color',[0.25 0.25 0.25]);
+
+    out.plotHandles.q1.mean = plot(t, q1_mu, ...
+              'LineWidth',1,'Color',[0.188 0.361 0.92]);
+
+    out.plotHandles.q1.legend = legend( ...
+        [out.plotHandles.q1.reference, out.plotHandles.q1.mean], ...
+        {'Simulated','Achieved'}, ...
+        'Location','northeast','FontSize',12);
+
+    ylabel('q_1 (radians)','FontSize',14)
+    xlabel('Time (s)','FontSize',14)
+
+    xlim(out.ax.q1, out.meta.xlim)
+
+    hold off
+
+
+    %% rho subplot (optional)
+    if includeRho
+
+        out.ax.rho = subplot(3,1,3);
+
+        rho_max = zeros(endpoint,1);
+
+        out.rho.all = rho_all;
+        out.rho.time = t;
+        out.rho.max = rho_max;
+
+        out.rho.fillX = [t; flipud(t)];
+        out.rho.fillY = [rho_upper; flipud(rho_lower)];
+        out.rho.fillColor = [0.188 0.361 0.92];
+        out.rho.fillAlpha = 0.2;
+
+        out.plotHandles.rho.band = fill([t; flipud(t)], ...
+             [rho_upper; flipud(rho_lower)], ...
+             [0.188 0.361 0.92], ...
+             'EdgeColor','none','FaceAlpha',0.2);
+        hold on
+
+        out.plotHandles.rho.maximum = plot(t_ref, rho_max, ...
+                  '--','LineWidth',2,'Color','red');
+
+        out.plotHandles.rho.mean = plot(t, rho_mu, ...
+                  'LineWidth',1,'Color',[0.188 0.361 0.92]);
+
+        out.plotHandles.rho.legend = legend( ...
+            [out.plotHandles.rho.maximum, out.plotHandles.rho.mean], ...
+            {'Minimum Rho','Calculated Rho'}, ...
+            'Location','northeast','FontSize',12);
+
+        ylabel('Rho','FontSize',14)
+        xlabel('Time (s)','FontSize',14)
+
+        xlim(out.ax.rho, out.meta.xlim)
+
+        hold off
+
+    end
 
 end
 
