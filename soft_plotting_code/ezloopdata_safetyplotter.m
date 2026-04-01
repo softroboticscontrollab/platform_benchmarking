@@ -107,6 +107,16 @@ t_ref = time_ref(1:endpoint);
 out.time = t;
 out.time_ref = t_ref;
 
+%% Store fill() data for q0 and q1 (for external plotting)
+
+% q0 fill
+out.q0.fillX = [t; flipud(t)];
+out.q0.fillY = [out.q0.upper; flipud(out.q0.lower)];
+
+% q1 fill
+out.q1.fillX = [t; flipud(t)];
+out.q1.fillY = [out.q1.upper; flipud(out.q1.lower)];
+
 %% Store reference
 out.reference.q = q_ref(1:endpoint,:);
 

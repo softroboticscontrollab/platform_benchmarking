@@ -320,21 +320,105 @@ sim_q2_inter = sim_calib_data.export_data(:,5);
 % % exportgraphics(th, strcat(fname, '.pdf'), 'ContentType', 'vector');
 % exportgraphics(th, strcat(fname, '.png'), 'ContentType', 'vector');
 
-figure(1)
+Fmax = 11.16 * 1.6 / 100;  
 
 out1 = TnRCDFP;
 
+    % Back-calculate raw force for every run
+    out1.raw.force_all = Fmax * (1 - out1.raw.rho_all);
+
+    % Best way: compute force statistics from the raw transformed data
+    out1.force.mu    = mean(out1.raw.force_all, 2);
+    out1.force.sigma = std(out1.raw.force_all, 0, 2);
+    out1.force.upper = out1.force.mu + 2*out1.force.sigma;
+    out1.force.lower = out1.force.mu - 2*out1.force.sigma;
+
+    % Force fill data
+    out1.force.fillX = [out1.time; flipud(out1.time)];
+    out1.force.fillY = [out1.force.upper; flipud(out1.force.lower)];
+    out1.force.fillColor = [0.850 0.325 0.098];
+    out1.force.fillAlpha = 0.2;
+
 out2 = TnRHigh;
-hold on
+
+    % Back-calculate raw force for every run
+    out2.raw.force_all = Fmax * (1 - out2.raw.rho_all);
+
+    % Best way: compute force statistics from the raw transformed data
+    out2.force.mu    = mean(out2.raw.force_all, 2);
+    out2.force.sigma = std(out2.raw.force_all, 0, 2);
+    out2.force.upper = out2.force.mu + 2*out2.force.sigma;
+    out2.force.lower = out2.force.mu - 2*out2.force.sigma;
+
+    % Force fill data
+    out2.force.fillX = [out2.time; flipud(out2.time)];
+    out2.force.fillY = [out2.force.upper; flipud(out2.force.lower)];
+    out2.force.fillColor = [0.850 0.325 0.098];
+    out2.force.fillAlpha = 0.2;
+
+F_max = Fmax*ones(length(out1.time),1);
+% rho plot
+figure
 fill(out1.rho.fillX, out1.rho.fillY, [0 0.447 0.741], ...
     'EdgeColor', 'none', 'FaceAlpha', 0.15);
+hold on
 
 fill(out2.rho.fillX, out2.rho.fillY, [0.850 0.325 0.098], ...
     'EdgeColor', 'none', 'FaceAlpha', 0.15);
 
-p1 = plot(out1.rho.time, out1.rho.mu, 'LineWidth', 1.5);
-p2 = plot(out2.rho.time, out2.rho.mu, 'LineWidth', 1.5);
+p1 = plot(out1.rho.time, out1.rho.mu, 'Color', [0 0.447 0.741], 'LineWidth', 1.5);
+p2 = plot(out2.rho.time, out2.rho.mu, 'Color', [0.850 0.325 0.098], 'LineWidth', 1.5);
 p3 = plot(out1.rho.time, out1.rho.max, '--r', 'LineWidth', 1.5);
 
-ylabel('Rho');xlabel('Time(s)')
+ylabel('Rho');xlabel('Time (s)')
 legend([p1,p2,p3],{'Tracking Only','Tracking with CBF','Max Allowable Rho'},'Location','best','FontSize',12);
+hold off
+% force plot
+figure
+fill(out1.force.fillX, out1.force.fillY, [0 0.447 0.741], ...
+    'EdgeColor', 'none', 'FaceAlpha', 0.15);
+hold on
+
+fill(out2.force.fillX, out2.force.fillY, [0.850 0.325 0.098], ...
+    'EdgeColor', 'none', 'FaceAlpha', 0.15);
+
+p1 = plot(out1.time, out1.force.mu, 'Color', [0 0.447 0.741], 'LineWidth', 1.5);
+p2 = plot(out2.time, out2.force.mu, 'Color', [0.850 0.325 0.098], 'LineWidth', 1.5);
+p3 = plot(out1.time, F_max, '--r', 'LineWidth', 1.5);
+
+ylabel('Force (N)');xlabel('Time (s)')
+legend([p1,p2,p3],{'CD','CBF','Max Allowable Force'},'Location','best','FontSize',12);
+hold off
+
+%% comparison of q0 and q1 for CD vs CBF
+figure;
+
+subplot(2,1,1)
+fill(out1.q0.fillX, out1.q0.fillY, [0 0.4470 0.7410], 'FaceAlpha', 0.2, 'EdgeColor', 'none'); hold on
+fill(out2.q0.fillX, out2.q0.fillY, [0.8500 0.3250 0.0980], 'FaceAlpha', 0.2, 'EdgeColor', 'none');
+
+p_r1 = plot(out1.time_ref, out1.reference.q(:,1), '-.', 'Color', [0.2 0.2 0.2], 'LineWidth', 2);
+
+p1 = plot(out1.time, out1.q0.mu, 'Color', [0 0.4470 0.7410], 'LineWidth', 1.5);
+p2 = plot(out2.time, out2.q0.mu, 'Color', [0.8500 0.3250 0.0980], 'LineWidth', 1.5);
+
+xlabel('Time (s)')
+ylabel('q_0 (radians)')
+%title('q_0 Comparison')
+legend([p_r1, p1, p2], {'Reference','CD','CBF'}, 'Location','best')
+hold off
+
+subplot(2,1,2)
+fill(out1.q1.fillX, out1.q1.fillY, [0 0.4470 0.7410], 'FaceAlpha', 0.2, 'EdgeColor', 'none'); hold on
+fill(out2.q1.fillX, out2.q1.fillY, [0.8500 0.3250 0.0980], 'FaceAlpha', 0.2, 'EdgeColor', 'none');
+
+p_r1 = plot(out1.time_ref, out1.reference.q(:,2), '-.', 'Color', [0.2 0.2 0.2], 'LineWidth', 2);
+
+p1 = plot(out1.time, out1.q1.mu, 'Color', [0 0.4470 0.7410], 'LineWidth', 1.5);
+p2 = plot(out2.time, out2.q1.mu, 'Color', [0.8500 0.3250 0.0980], 'LineWidth', 1.5);
+
+xlabel('Time (s)')
+ylabel('q_1 (radians)')
+%title('q_1 Comparison')
+%legend([p_r1, p1, p2], {'Reference','CD','CBF'}, 'Location','best')
+hold off
