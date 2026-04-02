@@ -216,6 +216,9 @@ TnRHigh = ezloopdata_safetyplotter(smooth_q_cells, time_cells, time_TnR4, smooth
 
 %% Example Plotting code used for Robosoft poster
 %%%%%%%%%%%%%%%%%%%
+single_column = true;
+picturewidth_singlecolumn = 8.6*2 ; % cm
+
 sim_calib_data = load('callibration_data.mat');
 sim_time = sim_calib_data.export_data(:,1);
 sim_q1 = sim_calib_data.export_data(:,2);
@@ -223,21 +226,46 @@ sim_q2 = sim_calib_data.export_data(:,3);
 sim_q1_inter = sim_calib_data.export_data(:,4);
 sim_q2_inter = sim_calib_data.export_data(:,5);
 
-% Side by Side of q1 q2 for Open-Loop trajectroy and CD tracking
-% figure
-% subplot(1,2,1)
-% 
-%     fill([CalibCD.time; flipud(CalibCD.time)], ...
-%          [CalibCD.q0.upper; flipud(CalibCD.q0.lower)], ...
-%          [0 0.604 0.192], ...
-%          'EdgeColor','none','FaceAlpha',0.2);
-%     hold on
-% 
-%     p1 = plot(time_cal, smooth_q_cal, ...
-%               'LineWidth',2,'Color',[0.25 0.25 0.25]);
-% 
-%     p2 = plot(time_cal, CalibCD.q0.mu, ...
-%               'LineWidth',1,'Color',[0 0.604 0.192]);
+sim_q1 = deg2rad(sim_q1);
+sim_q2 = deg2rad(sim_q2);
+
+sim_q1_inter = deg2rad(sim_q1_inter);
+sim_q2_inter = deg2rad(sim_q2_inter);
+
+sim_plot = figure;
+
+subplot(2,1,1)
+p_r1 = plot(sim_time, smooth_q_cal(2:end,1), '-.', 'Color', [0.2 0.2 0.2], 'LineWidth', 2); hold on
+p1 = plot(sim_time, sim_q1_inter, 'Color', [0 0.4470 0.7410], 'LineWidth', 1.5);
+
+xlabel('Time (s)','FontSize',15)
+ylabel('$q_0$ (radians)','FontSize',15)
+lgd = legend([p1, p_r1], {'Calibrated Simulation','Reference Data'}, 'Location','best','FontSize',12);
+xlim([0 sim_time(end)])
+grid on;
+hold off
+
+subplot(2,1,2)
+p_r1 = plot(sim_time, smooth_q_cal(2:end,2), '-.', 'Color', [0.2 0.2 0.2], 'LineWidth', 2); hold on
+p1 = plot(sim_time, sim_q2_inter, 'Color', [0 0.4470 0.7410], 'LineWidth', 1.5);
+
+xlabel('Time (s)','FontSize',15)
+ylabel('$q_1$ (radians)','FontSize',15)
+grid on;
+hold off
+
+hw_ratio = 1.1;
+
+set(findall(sim_plot,'-property','Interpreter'), 'Interpreter', 'latex')
+set(findall(sim_plot,'-property','TickLabelInterpreter'), 'TickLabelInterpreter', 'latex')
+set(findall(sim_plot,'-property','Box'), 'Box', 'off')
+set(sim_plot, 'Units', 'centimeters', ...
+        'Position', [2.3 1 picturewidth_singlecolumn hw_ratio * picturewidth_singlecolumn]);
+xlim([0 sim_time(end)])
+grid on;
+
+fname = 'fin_plots/SimTuning';
+exportgraphics(sim_plot, strcat(fname, '.png'), 'ContentType', 'vector');
 
 %% FIGURES for Paper 
 
