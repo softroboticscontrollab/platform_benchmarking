@@ -38,29 +38,36 @@ k = 11.16;
 dat = 'manuscript_data/ezloophw_closedloop_ros2_reserv_pneumatics_2026-3-25_CalibrationRunV1.csv';
 [time_cal, q_cal, dq_cal, ddq_cal, smooth_q_cal, smooth_dq_cal, smooth_ddq_cal, calib_start,~] = ezloopdata_compare(dat, false, false, true, 0);
 
-dat = 'manuscript_data/ezloophw_closedloop_ros2_reserv_pneumatics_2026-3-25_TrackCalib1.csv'; 
-[time_tra1, q_tra1, dq_tra1, ddq_tra1, smooth_q_tra1, smooth_dq_tra1, smooth_ddq_tra1,~,~] = ezloopdata_compare(dat, false, false, true, calib_start);
+% PD Tuning Results 
+dat = 'manuscript_data/ezloophw_closedloop_ros2_reserv_pneumatics_2026-3-26_PD1.csv'; 
+[time_PD1, q_PD1, dq_PD1, ddq_PD1, smooth_q_PD1, smooth_dq_PD1, smooth_ddq_PD1,~,~] = ezloopdata_compare(dat, false, false, true, 0);
 
-dat = 'manuscript_data/ezloophw_closedloop_ros2_reserv_pneumatics_2026-3-25_TrackCalib2.csv'; 
-[time_tra2, q_tra2, dq_tra2, ddq_tra2, smooth_q_tra2, smooth_dq_tra2, smooth_ddq_tra2,~,~] = ezloopdata_compare(dat, false, false, true, calib_start);
+dat = 'manuscript_data/ezloophw_closedloop_ros2_reserv_pneumatics_2026-3-26_PD2.csv'; 
+[time_PD2, q_PD2, dq_PD2, ddq_PD2, smooth_q_PD2, smooth_dq_PD2, smooth_ddq_PD2,~,~] = ezloopdata_compare(dat, false, false, true, 0);
 
-dat = 'manuscript_data/ezloophw_closedloop_ros2_reserv_pneumatics_2026-3-25_TrackCalib3.csv'; 
-[time_tra3, q_tra3, dq_tra3, ddq_tra3, smooth_q_tra3, smooth_dq_tra3, smooth_ddq_tra3,~,~] = ezloopdata_compare(dat, false, false, true, calib_start);
+dat = 'manuscript_data/ezloophw_closedloop_ros2_reserv_pneumatics_2026-3-26_PD3.csv'; 
+[time_PD3, q_PD3, dq_PD3, ddq_PD3, smooth_q_PD3, smooth_dq_PD3, smooth_ddq_PD3,~,~] = ezloopdata_compare(dat, false, false, true, 0);
 
-dat = 'manuscript_data/ezloophw_closedloop_ros2_reserv_pneumatics_2026-3-25_TrackCalib4.csv'; 
-[time_tra4, q_tra4, dq_tra4, ddq_tra4, smooth_q_tra4, smooth_dq_tra4, smooth_ddq_tra4,~,~] = ezloopdata_compare(dat, false, false, true, calib_start);
+dat = 'manuscript_data/ezloophw_closedloop_ros2_reserv_pneumatics_2026-3-26_PD4.csv'; 
+[time_PD4, q_PD4, dq_PD4, ddq_PD4, smooth_q_PD4, smooth_dq_PD4, smooth_ddq_PD4,~,~] = ezloopdata_compare(dat, false, false, true, 0);
 
-dat = 'manuscript_data/ezloophw_closedloop_ros2_reserv_pneumatics_2026-3-25_TrackCalib5.csv'; 
-[time_tra5, q_tra5, dq_tra5, ddq_tra5, smooth_q_tra5, smooth_dq_tra5, smooth_ddq_tra5,~,~] = ezloopdata_compare(dat, false, false, true, calib_start);
+dat = 'manuscript_data/ezloophw_closedloop_ros2_reserv_pneumatics_2026-3-26_PD5.csv'; 
+[time_PD5, q_PD5, dq_PD5, ddq_PD5, smooth_q_PD5, smooth_dq_PD5, smooth_ddq_PD5,~,~] = ezloopdata_compare(dat, false, false, true, 0);
 
-smooth_q_cells = {smooth_q_tra1, smooth_q_tra2, smooth_q_tra3, ...
-                  smooth_q_tra4, smooth_q_tra5};
+smooth_q_cells = {smooth_q_PD1, smooth_q_PD2, smooth_q_PD3, ...
+                  smooth_q_PD4, smooth_q_PD5};
 
-time_cells = {time_tra1, time_tra2, time_tra3, time_tra4, time_tra5};
+time_cells = {time_PD1, time_PD2, time_PD3, time_PD4, time_PD5};
 
 rho_cells = {};
 
-CalibCD = ezloopdata_safetyplotter(smooth_q_cells, time_cells, time_cal, smooth_q_cal, false, rho_cells, false);
+time_step = time_PD1;
+
+p_des = [deg2rad(20); -1*deg2rad(20)]; 
+
+smooth_q_step = [p_des(1)*ones(length(time_PD1),1) p_des(2)*ones(length(time_PD1),1)];
+
+TunePD = ezloopdata_safetyplotter(smooth_q_cells, time_cells, time_step, smooth_q_step, false, rho_cells,false);
 
 % PD Attempt at Tracking Calibration 
 dat = 'manuscript_data/ezloophw_closedloop_ros2_reserv_pneumatics_2026-3-26_PDCal1.csv'; 
@@ -86,6 +93,31 @@ time_cells = {time_PDCal1, time_PDCal2, time_PDCal3, time_PDCal4, time_PDCal5};
 rho_cells = {};
 
 CalibPD = ezloopdata_safetyplotter(smooth_q_cells, time_cells, time_cal, smooth_q_cal, false, rho_cells,false);
+
+% CD Results tracking calib trajectory
+dat = 'manuscript_data/ezloophw_closedloop_ros2_reserv_pneumatics_2026-3-25_TrackCalib1.csv'; 
+[time_tra1, q_tra1, dq_tra1, ddq_tra1, smooth_q_tra1, smooth_dq_tra1, smooth_ddq_tra1,~,~] = ezloopdata_compare(dat, false, false, true, calib_start);
+
+dat = 'manuscript_data/ezloophw_closedloop_ros2_reserv_pneumatics_2026-3-25_TrackCalib2.csv'; 
+[time_tra2, q_tra2, dq_tra2, ddq_tra2, smooth_q_tra2, smooth_dq_tra2, smooth_ddq_tra2,~,~] = ezloopdata_compare(dat, false, false, true, calib_start);
+
+dat = 'manuscript_data/ezloophw_closedloop_ros2_reserv_pneumatics_2026-3-25_TrackCalib3.csv'; 
+[time_tra3, q_tra3, dq_tra3, ddq_tra3, smooth_q_tra3, smooth_dq_tra3, smooth_ddq_tra3,~,~] = ezloopdata_compare(dat, false, false, true, calib_start);
+
+dat = 'manuscript_data/ezloophw_closedloop_ros2_reserv_pneumatics_2026-3-25_TrackCalib4.csv'; 
+[time_tra4, q_tra4, dq_tra4, ddq_tra4, smooth_q_tra4, smooth_dq_tra4, smooth_ddq_tra4,~,~] = ezloopdata_compare(dat, false, false, true, calib_start);
+
+dat = 'manuscript_data/ezloophw_closedloop_ros2_reserv_pneumatics_2026-3-25_TrackCalib5.csv'; 
+[time_tra5, q_tra5, dq_tra5, ddq_tra5, smooth_q_tra5, smooth_dq_tra5, smooth_ddq_tra5,~,~] = ezloopdata_compare(dat, false, false, true, calib_start);
+
+smooth_q_cells = {smooth_q_tra1, smooth_q_tra2, smooth_q_tra3, ...
+                  smooth_q_tra4, smooth_q_tra5};
+
+time_cells = {time_tra1, time_tra2, time_tra3, time_tra4, time_tra5};
+
+rho_cells = {};
+
+CalibCD = ezloopdata_safetyplotter(smooth_q_cells, time_cells, time_cal, smooth_q_cal, false, rho_cells, false);
 
 %% To visualize how the filter works, below are two examples
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -207,118 +239,10 @@ sim_q2_inter = sim_calib_data.export_data(:,5);
 %     p2 = plot(time_cal, CalibCD.q0.mu, ...
 %               'LineWidth',1,'Color',[0 0.604 0.192]);
 
-%% FIGURE 7 of RandR - Hardware experiment results
-% th = figure(1);
-% t2 = tiledlayout(5,1);
-% t2.TileSpacing = 'compact';
-% t2.Padding = 'tight';
-% 
-% ax1 = nexttile;
-% x1 = plot(time_NONET1(idx),Tip_x_NONET1(idx),LineWidth=2,Color=[0.25, 0.25, 0.25],LineStyle="--");
-% hold on 
-% x2 = plot(time_LOWT1(idx),Tip_x_LOWT1(idx),LineWidth=2,Color=[0.9290, 0.6940, 0.1250]);
-% x3 = plot(time_MEDT1(idx),Tip_x_MEDT1(idx),LineWidth=2,Color=[0 0.604 0.192]);
-% x4 = plot(time_HIGHT1(idx),Tip_x_HIGHT1(idx),LineWidth=2,Color=[0.188 0.361 0.92]);
-% hold off
-% 
-% ylabel('$r_x$ (m)') 
-% 
-% grid on;
-% xlim([0 70])
-% lgd = legend([x1 x2 x3 x4],{'None','Low','Medium','High'},'orientation','horizontal','Location','north');   
-% 
-% uistack(x2,'bottom')
-% uistack(x1,'bottom')
-% 
-% ax2 = nexttile;
-% y1 = plot(time_NONET1(idx),Tip_y_NONET1(idx),LineWidth=2,Color=[0.25, 0.25, 0.25],LineStyle="--");
-% hold on 
-% y2 = plot(time_LOWT1(idx),Tip_y_LOWT1(idx),LineWidth=2,Color=[0.9290, 0.6940, 0.1250]);
-% y3 = plot(time_MEDT1(idx),Tip_y_MEDT1(idx),LineWidth=2,Color=[0 0.604 0.192]);
-% y4 = plot(time_HIGHT1(idx),Tip_y_HIGHT1(idx),LineWidth=2,Color=[0.188 0.361 0.92]);
-% hold off
-% % ax4.FontSize = 16;
-% ylabel('$r_y$ (m)') 
-% grid on;
-% xlim([0 70])
-% 
-% uistack(y2,'bottom')
-% uistack(y1,'bottom')
-% 
-% ax3 = nexttile;
-% f1 = plot(time_NONET1(idx),Fp0_NONET1(idx),LineWidth=2,Color=[0.25, 0.25, 0.25],LineStyle="--");
-% hold on 
-% f2 = plot(time_LOWT1(idx),Fp0_LOWT1(idx),LineWidth=2,Color=[0.9290, 0.6940, 0.1250]);
-% f3 = plot(time_MEDT1(idx),Fp0_MEDT1(idx),LineWidth=2,Color=[0 0.604 0.192]);
-% f4 = plot(time_HIGHT1(idx),Fp0_HIGHT1(idx),LineWidth=2,Color=[0.188 0.361 0.92]);
-% f5 = plot(time_NONET1(idx),Fmax_vector,LineWidth=1,Color='r');
-% hold off
-% x_pos = time_LOWT1(end);
-% text(x_pos-7, Fmax+0, '$F_{\mathrm{max}}$', 'Interpreter', 'latex', ...
-%      'HorizontalAlignment', 'right', 'VerticalAlignment', 'bottom', ...
-%      'Color', 'r', 'FontSize', 12);
-% % ax5.FontSize = 16;
-% grid on;
-% ylabel('F (N)') 
-% xlim([0 70])
-% 
-% uistack(f2,'bottom')
-% uistack(f1,'bottom')
-% uistack(f5, 'top')
-% 
-% ax4 = nexttile;
-% u1 = plot(time_NONET1(idx),u0_NONET1(idx),LineWidth=2,Color=[0.25, 0.25, 0.25],LineStyle="--");
-% hold on 
-% u2 = plot(time_LOWT1(idx),smoothed_u0_LOWT1(idx),LineWidth=2,Color=[0.9290, 0.6940, 0.1250]) ;
-% u3 = plot(time_MEDT1(idx),smoothed_u0_MEDT1(idx),LineWidth=2,Color=[0 0.604 0.192]);
-% u4 = plot(time_HIGHT1(idx),smoothed_u0_HIGHT1(idx),LineWidth=2,Color=[0.188 0.361 0.92]);
-% hold off 
-% % ax1.FontSize = 16;
-% ylabel('$u_1$ (hPa)') 
-% grid on;
-% xlim([0 70])
-% 
-% uistack(u2,'bottom')
-% uistack(u1,'bottom')
-% 
-% ax5 = nexttile;
-% uu1 = plot(time_NONET1(idx),u1_NONET1(idx),LineWidth=2,Color=[0.25, 0.25, 0.25],LineStyle="--");
-% hold on 
-% uu2 = plot(time_LOWT1(idx),smoothed_u1_LOWT1(idx),LineWidth=2,Color=[0.9290, 0.6940, 0.1250]);
-% uu3 = plot(time_MEDT1(idx),smoothed_u1_MEDT1(idx),LineWidth=2,Color=[0 0.604 0.192]);
-% uu4 = plot(time_HIGHT1(idx),smoothed_u1_HIGHT1(idx),LineWidth=2,Color=[0.188 0.361 0.92]);
-% hold off
-% % ax2.FontSize = 16;
-% ylabel('$u_2$ (hPa)') 
-% grid on;
-% 
-% xlabel('Time (s)')
-% xlim([0 70])
-% 
-% uistack(uu2,'bottom')
-% uistack(uu1,'bottom')
-% 
-% hw_ratio = 1.1;
-% 
-% set(findall(t2,'-property','Interpreter'), 'Interpreter', 'latex')
-% set(findall(t2,'-property','TickLabelInterpreter'), 'TickLabelInterpreter', 'latex')
-% set(findall(t2,'-property','Box'), 'Box', 'off')
-% % set(t2, 'Units', 'centimeters', ...
-% %         'Position', [2.3 1 picturewidth_singlecolumn hw_ratio * picturewidth_singlecolumn]);
-% set(t2, 'Units', 'centimeters', ...
-%         'Position', [3 1 picturewidth_singlecolumn hw_ratio * picturewidth_singlecolumn]);
-% grid on;
-% 
-% lgd.Units = 'normalized';       % Make position relative to axes
-% pos1 = lgd.Position;
-% pos1(1) = pos1(1) + 0.0;         % Move right
-% pos1(2) = pos1(2) + 0.07;         % Move up
-% lgd.Position = pos1;
-% 
-% fname = 'HW_results_RandR_v3';
-% % exportgraphics(th, strcat(fname, '.eps'), 'ContentType', 'vector');
-% % exportgraphics(th, strcat(fname, '.pdf'), 'ContentType', 'vector');
-% exportgraphics(th, strcat(fname, '.png'), 'ContentType', 'vector');
+%% FIGURES for Paper 
+
+single_column = true;
+picturewidth_singlecolumn = 8.6*2 ; % cm
 
 Fmax = 11.16 * 1.6 / 100;  
 
@@ -357,8 +281,8 @@ out2 = TnRHigh;
     out2.force.fillAlpha = 0.2;
 
 F_max = Fmax*ones(length(out1.time),1);
-% rho plot
-figure
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% rho plot
+rho_plot = figure;
 fill(out1.rho.fillX, out1.rho.fillY, [0 0.447 0.741], ...
     'EdgeColor', 'none', 'FaceAlpha', 0.15);
 hold on
@@ -370,11 +294,31 @@ p1 = plot(out1.rho.time, out1.rho.mu, 'Color', [0 0.447 0.741], 'LineWidth', 1.5
 p2 = plot(out2.rho.time, out2.rho.mu, 'Color', [0.850 0.325 0.098], 'LineWidth', 1.5);
 p3 = plot(out1.rho.time, out1.rho.max, '--r', 'LineWidth', 1.5);
 
-ylabel('Rho');xlabel('Time (s)')
-legend([p1,p2,p3],{'Tracking Only','Tracking with CBF','Max Allowable Rho'},'Location','best','FontSize',12);
+ylabel('Rho','FontSize',15);xlabel('Time ($s$)','FontSize',15)
+lgd = legend([p1,p2,p3],{'CD','CBF','Max Rho'},'Location','best','FontSize',12);
+
+lgd.Units = 'normalized';       % Make position relative to axes
+pos1 = lgd.Position;
+pos1(1) = pos1(1) - 0.26;         % Move right
+pos1(2) = pos1(2) + 0.3;         % Move up
+lgd.Position = pos1;
+
 hold off
-% force plot
-figure
+
+hw_ratio = 1.1;
+
+set(findall(rho_plot,'-property','Interpreter'), 'Interpreter', 'latex')
+set(findall(rho_plot,'-property','TickLabelInterpreter'), 'TickLabelInterpreter', 'latex')
+set(findall(rho_plot,'-property','Box'), 'Box', 'off')
+set(rho_plot, 'Units', 'centimeters', ...
+        'Position', [2.3 1 picturewidth_singlecolumn hw_ratio * picturewidth_singlecolumn]);
+grid on;
+
+fname = 'fin_plots/Rho_Comparison';
+exportgraphics(rho_plot, strcat(fname, '.png'), 'ContentType', 'vector');
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% force plot
+force_plot = figure;
 fill(out1.force.fillX, out1.force.fillY, [0 0.447 0.741], ...
     'EdgeColor', 'none', 'FaceAlpha', 0.15);
 hold on
@@ -386,12 +330,30 @@ p1 = plot(out1.time, out1.force.mu, 'Color', [0 0.447 0.741], 'LineWidth', 1.5);
 p2 = plot(out2.time, out2.force.mu, 'Color', [0.850 0.325 0.098], 'LineWidth', 1.5);
 p3 = plot(out1.time, F_max, '--r', 'LineWidth', 1.5);
 
-ylabel('Force (N)');xlabel('Time (s)')
-legend([p1,p2,p3],{'CD','CBF','Max Allowable Force'},'Location','best','FontSize',12);
+ylabel('Force ($N$)','FontSize',15);xlabel('Time ($s$)','FontSize',15)
+lgd = legend([p1,p2,p3],{'CD','CBF','Max Force'},'Location','best','FontSize',12);
+% lgd.Units = 'normalized';       % Make position relative to axes
+% pos1 = lgd.Position;
+% pos1(1) = pos1(1) - 0;         % Move right
+% pos1(2) = pos1(2) + 0;         % Move up
+% lgd.Position = pos1;
+
 hold off
 
+hw_ratio = 1.1;
+
+set(findall(force_plot,'-property','Interpreter'), 'Interpreter', 'latex')
+set(findall(force_plot,'-property','TickLabelInterpreter'), 'TickLabelInterpreter', 'latex')
+set(findall(force_plot,'-property','Box'), 'Box', 'off')
+set(force_plot, 'Units', 'centimeters', ...
+        'Position', [2.3 1 picturewidth_singlecolumn hw_ratio * picturewidth_singlecolumn]);
+grid on;
+
+fname = 'fin_plots/Force_Comparison';
+exportgraphics(force_plot, strcat(fname, '.png'), 'ContentType', 'vector');
+
 %% comparison of q0 and q1 for CD vs CBF
-figure;
+traj_plot = figure;
 
 subplot(2,1,1)
 fill(out1.q0.fillX, out1.q0.fillY, [0 0.4470 0.7410], 'FaceAlpha', 0.2, 'EdgeColor', 'none'); hold on
@@ -402,10 +364,10 @@ p_r1 = plot(out1.time_ref, out1.reference.q(:,1), '-.', 'Color', [0.2 0.2 0.2], 
 p1 = plot(out1.time, out1.q0.mu, 'Color', [0 0.4470 0.7410], 'LineWidth', 1.5);
 p2 = plot(out2.time, out2.q0.mu, 'Color', [0.8500 0.3250 0.0980], 'LineWidth', 1.5);
 
-xlabel('Time (s)')
-ylabel('q_0 (radians)')
-%title('q_0 Comparison')
-legend([p_r1, p1, p2], {'Reference','CD','CBF'}, 'Location','best')
+xlabel('Time (s)','FontSize',15)
+ylabel('$q_0$ (radians)','FontSize',15)
+lgd = legend([p1, p2, p_r1], {'CD','CBF','Reference'}, 'Location','best','FontSize',12);
+grid on;
 hold off
 
 subplot(2,1,2)
@@ -417,8 +379,180 @@ p_r1 = plot(out1.time_ref, out1.reference.q(:,2), '-.', 'Color', [0.2 0.2 0.2], 
 p1 = plot(out1.time, out1.q1.mu, 'Color', [0 0.4470 0.7410], 'LineWidth', 1.5);
 p2 = plot(out2.time, out2.q1.mu, 'Color', [0.8500 0.3250 0.0980], 'LineWidth', 1.5);
 
-xlabel('Time (s)')
-ylabel('q_1 (radians)')
-%title('q_1 Comparison')
-%legend([p_r1, p1, p2], {'Reference','CD','CBF'}, 'Location','best')
+xlabel('Time ($s$)','FontSize',15)
+ylabel('$q_1$ (radians)','FontSize',15)
 hold off
+
+% lgd.Units = 'normalized';       % Make position relative to axes
+% pos1 = lgd.Position;
+% pos1(1) = pos1(1) - 0;         % Move right
+% pos1(2) = pos1(2) + 0;         % Move up
+% lgd.Position = pos1;
+
+hw_ratio = 1.1;
+
+set(findall(traj_plot,'-property','Interpreter'), 'Interpreter', 'latex')
+set(findall(traj_plot,'-property','TickLabelInterpreter'), 'TickLabelInterpreter', 'latex')
+set(findall(traj_plot,'-property','Box'), 'Box', 'off')
+set(traj_plot, 'Units', 'centimeters', ...
+        'Position', [2.3 1 picturewidth_singlecolumn hw_ratio * picturewidth_singlecolumn]);
+grid on;
+
+fname = 'fin_plots/TrajectoryTracking_Comparison';
+exportgraphics(traj_plot, strcat(fname, '.png'), 'ContentType', 'vector');
+
+%% PD tuning results
+
+pdtuning_plot = figure;
+
+subplot(2,1,1)
+fill(TunePD.q0.fillX, TunePD.q0.fillY, [0 0.4470 0.7410], 'FaceAlpha', 0.2, 'EdgeColor', 'none'); hold on
+p_r1 = plot(TunePD.time_ref, TunePD.reference.q(:,1), '-.', 'Color', [0.2 0.2 0.2], 'LineWidth', 2);
+p1 = plot(TunePD.time, TunePD.q0.mu, 'Color', [0 0.4470 0.7410], 'LineWidth', 1.5);
+
+xlabel('Time (s)','FontSize',15)
+ylabel('$q_0$ (radians)','FontSize',15)
+lgd = legend([p1, p_r1], {'PD','Reference'}, 'Location','best','FontSize',12);
+xlim([0 TunePD.time_ref(end)])
+grid on;
+hold off
+
+subplot(2,1,2)
+fill(TunePD.q1.fillX, TunePD.q1.fillY, [0 0.4470 0.7410], 'FaceAlpha', 0.2, 'EdgeColor', 'none'); hold on
+p_r1 = plot(TunePD.time_ref, TunePD.reference.q(:,2), '-.', 'Color', [0.2 0.2 0.2], 'LineWidth', 2);
+p1 = plot(TunePD.time, TunePD.q1.mu, 'Color', [0 0.4470 0.7410], 'LineWidth', 1.5);
+
+xlabel('Time (s)','FontSize',15)
+ylabel('$q_1$ (radians)','FontSize',15)
+grid on;
+hold off
+
+hw_ratio = 1.1;
+
+set(findall(pdtuning_plot,'-property','Interpreter'), 'Interpreter', 'latex')
+set(findall(pdtuning_plot,'-property','TickLabelInterpreter'), 'TickLabelInterpreter', 'latex')
+set(findall(pdtuning_plot,'-property','Box'), 'Box', 'off')
+set(pdtuning_plot, 'Units', 'centimeters', ...
+        'Position', [2.3 1 picturewidth_singlecolumn hw_ratio * picturewidth_singlecolumn]);
+xlim([0 TunePD.time_ref(end)])
+grid on;
+
+fname = 'fin_plots/PDTuning';
+exportgraphics(pdtuning_plot, strcat(fname, '.png'), 'ContentType', 'vector');
+
+%% PD tracking results
+
+pdtracking_plot = figure;
+
+subplot(2,1,1)
+fill(CalibPD.q0.fillX, CalibPD.q0.fillY, [0 0.4470 0.7410], 'FaceAlpha', 0.2, 'EdgeColor', 'none'); hold on
+p_r1 = plot(CalibPD.time_ref, CalibPD.reference.q(:,1), '-.', 'Color', [0.2 0.2 0.2], 'LineWidth', 2);
+p1 = plot(CalibPD.time, CalibPD.q0.mu, 'Color', [0 0.4470 0.7410], 'LineWidth', 1.5);
+
+xlabel('Time (s)','FontSize',15)
+ylabel('$q_0$ (radians)','FontSize',15)
+lgd = legend([p1, p_r1], {'PD','Reference'}, 'Location','best','FontSize',12);
+xlim([0 CalibPD.time_ref(end)])
+grid on;
+hold off
+
+subplot(2,1,2)
+fill(CalibPD.q1.fillX, CalibPD.q1.fillY, [0 0.4470 0.7410], 'FaceAlpha', 0.2, 'EdgeColor', 'none'); hold on
+p_r1 = plot(CalibPD.time_ref, CalibPD.reference.q(:,2), '-.', 'Color', [0.2 0.2 0.2], 'LineWidth', 2);
+p1 = plot(CalibPD.time, CalibPD.q1.mu, 'Color', [0 0.4470 0.7410], 'LineWidth', 1.5);
+
+xlabel('Time (s)','FontSize',15)
+ylabel('$q_1$ (radians)','FontSize',15)
+grid on;
+hold off
+
+hw_ratio = 1.1;
+
+set(findall(pdtracking_plot,'-property','Interpreter'), 'Interpreter', 'latex')
+set(findall(pdtracking_plot,'-property','TickLabelInterpreter'), 'TickLabelInterpreter', 'latex')
+set(findall(pdtracking_plot,'-property','Box'), 'Box', 'off')
+set(pdtracking_plot, 'Units', 'centimeters', ...
+        'Position', [2.3 1 picturewidth_singlecolumn hw_ratio * picturewidth_singlecolumn]);
+xlim([0 CalibPD.time_ref(end)])
+grid on;
+
+fname = 'fin_plots/PDTracking';
+exportgraphics(pdtracking_plot, strcat(fname, '.png'), 'ContentType', 'vector');
+
+%% CD Tracking results 
+
+cdtracking_plot = figure;
+
+subplot(2,1,1)
+fill(CalibCD.q0.fillX, CalibCD.q0.fillY, [0 0.4470 0.7410], 'FaceAlpha', 0.2, 'EdgeColor', 'none'); hold on
+p_r1 = plot(CalibCD.time_ref, CalibCD.reference.q(:,1), '-.', 'Color', [0.2 0.2 0.2], 'LineWidth', 2);
+p1 = plot(CalibCD.time, CalibCD.q0.mu, 'Color', [0 0.4470 0.7410], 'LineWidth', 1.5);
+
+xlabel('Time (s)','FontSize',15)
+ylabel('$q_0$ (radians)','FontSize',15)
+lgd = legend([p1, p_r1], {'CD','Reference'}, 'Location','best','FontSize',12);
+xlim([0 CalibCD.time_ref(end)])
+grid on;
+hold off
+
+subplot(2,1,2)
+fill(CalibCD.q1.fillX, CalibCD.q1.fillY, [0 0.4470 0.7410], 'FaceAlpha', 0.2, 'EdgeColor', 'none'); hold on
+p_r1 = plot(CalibCD.time_ref, CalibCD.reference.q(:,2), '-.', 'Color', [0.2 0.2 0.2], 'LineWidth', 2);
+p1 = plot(CalibCD.time, CalibCD.q1.mu, 'Color', [0 0.4470 0.7410], 'LineWidth', 1.5);
+
+xlabel('Time (s)','FontSize',15)
+ylabel('$q_1$ (radians)','FontSize',15)
+grid on;
+hold off
+
+hw_ratio = 1.1;
+
+set(findall(cdtracking_plot,'-property','Interpreter'), 'Interpreter', 'latex')
+set(findall(cdtracking_plot,'-property','TickLabelInterpreter'), 'TickLabelInterpreter', 'latex')
+set(findall(cdtracking_plot,'-property','Box'), 'Box', 'off')
+set(cdtracking_plot, 'Units', 'centimeters', ...
+        'Position', [2.3 1 picturewidth_singlecolumn hw_ratio * picturewidth_singlecolumn]);
+xlim([0 CalibCD.time_ref(end)])
+grid on;
+
+fname = 'fin_plots/CDTracking';
+exportgraphics(cdtracking_plot, strcat(fname, '.png'), 'ContentType', 'vector');
+
+%% CD tracking of TnR
+
+cdtnr_plot = figure;
+
+subplot(2,1,1)
+fill(TnR.q0.fillX, TnR.q0.fillY, [0 0.4470 0.7410], 'FaceAlpha', 0.2, 'EdgeColor', 'none'); hold on
+p_r1 = plot(TnR.time_ref, TnR.reference.q(:,1), '-.', 'Color', [0.2 0.2 0.2], 'LineWidth', 2);
+p1 = plot(TnR.time, TnR.q0.mu, 'Color', [0 0.4470 0.7410], 'LineWidth', 1.5);
+
+xlabel('Time (s)','FontSize',15)
+ylabel('$q_0$ (radians)','FontSize',15)
+lgd = legend([p1, p_r1], {'CD','Reference'}, 'Location','best','FontSize',12);
+xlim([0 TnR.time_ref(end)])
+grid on;
+hold off
+
+subplot(2,1,2)
+fill(TnR.q1.fillX, TnR.q1.fillY, [0 0.4470 0.7410], 'FaceAlpha', 0.2, 'EdgeColor', 'none'); hold on
+p_r1 = plot(TnR.time_ref, TnR.reference.q(:,2), '-.', 'Color', [0.2 0.2 0.2], 'LineWidth', 2);
+p1 = plot(TnR.time, TnR.q1.mu, 'Color', [0 0.4470 0.7410], 'LineWidth', 1.5);
+
+xlabel('Time (s)','FontSize',15)
+ylabel('$q_1$ (radians)','FontSize',15)
+grid on;
+hold off
+
+hw_ratio = 1.1;
+
+set(findall(cdtnr_plot,'-property','Interpreter'), 'Interpreter', 'latex')
+set(findall(cdtnr_plot,'-property','TickLabelInterpreter'), 'TickLabelInterpreter', 'latex')
+set(findall(cdtnr_plot,'-property','Box'), 'Box', 'off')
+set(cdtnr_plot, 'Units', 'centimeters', ...
+        'Position', [2.3 1 picturewidth_singlecolumn hw_ratio * picturewidth_singlecolumn]);
+xlim([0 TnR.time_ref(end)])
+grid on;
+
+fname = 'fin_plots/CDTnRTracking';
+exportgraphics(cdtnr_plot, strcat(fname, '.png'), 'ContentType', 'vector');
