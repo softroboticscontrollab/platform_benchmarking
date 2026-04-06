@@ -360,11 +360,6 @@ p3 = plot(out1.time, F_max, '--r', 'LineWidth', 1.5);
 
 ylabel('Force ($N$)','FontSize',15);xlabel('Time ($s$)','FontSize',15)
 lgd = legend([p1,p2,p3],{'CD','CBF','Max Force'},'Location','best','FontSize',12);
-% lgd.Units = 'normalized';       % Make position relative to axes
-% pos1 = lgd.Position;
-% pos1(1) = pos1(1) - 0;         % Move right
-% pos1(2) = pos1(2) + 0;         % Move up
-% lgd.Position = pos1;
 
 hold off
 
@@ -379,6 +374,60 @@ grid on;
 
 fname = 'fin_plots/Force_Comparison';
 exportgraphics(force_plot, strcat(fname, '.png'), 'ContentType', 'vector');
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% force plot, just CD
+forceCD_plot = figure;
+fill(out1.force.fillX, out1.force.fillY, [0 0.447 0.741], ...
+    'EdgeColor', 'none', 'FaceAlpha', 0.15);
+hold on
+
+p1 = plot(out1.time, out1.force.mu, 'Color', [0 0.447 0.741], 'LineWidth', 1.5);
+p3 = plot(out1.time, F_max, '--r', 'LineWidth', 1.5);
+
+ylabel('Force ($N$)','FontSize',15);xlabel('Time ($s$)','FontSize',15)
+lgd = legend([p1,p3],{'CD','Max Force'},'Location','best','FontSize',12);
+
+hold off
+
+hw_ratio = 1.1;
+
+set(findall(forceCD_plot,'-property','Interpreter'), 'Interpreter', 'latex')
+set(findall(forceCD_plot,'-property','TickLabelInterpreter'), 'TickLabelInterpreter', 'latex')
+set(findall(forceCD_plot,'-property','Box'), 'Box', 'off')
+set(forceCD_plot, 'Units', 'centimeters', ...
+        'Position', [2.3 1 picturewidth_singlecolumn hw_ratio * picturewidth_singlecolumn]);
+grid on;
+
+fname = 'fin_plots/ForceCD_Comparison';
+exportgraphics(forceCD_plot, strcat(fname, '.png'), 'ContentType', 'vector');
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% force plot, just CBF
+
+forceCBF_plot = figure;
+hold on
+
+fill(out2.force.fillX, out2.force.fillY, [0.850 0.325 0.098], ...
+    'EdgeColor', 'none', 'FaceAlpha', 0.15);
+
+p2 = plot(out2.time, out2.force.mu, 'Color', [0.850 0.325 0.098], 'LineWidth', 1.5);
+p3 = plot(out1.time, F_max, '--r', 'LineWidth', 1.5);
+
+ylabel('Force ($N$)','FontSize',15);xlabel('Time ($s$)','FontSize',15)
+lgd = legend([p2,p3],{'CBF','Max Force'},'Location','best','FontSize',12);
+
+hold off
+
+hw_ratio = 1.1;
+
+set(findall(forceCBF_plot,'-property','Interpreter'), 'Interpreter', 'latex')
+set(findall(forceCBF_plot,'-property','TickLabelInterpreter'), 'TickLabelInterpreter', 'latex')
+set(findall(forceCBF_plot,'-property','Box'), 'Box', 'off')
+set(forceCBF_plot, 'Units', 'centimeters', ...
+        'Position', [2.3 1 picturewidth_singlecolumn hw_ratio * picturewidth_singlecolumn]);
+grid on;
+
+fname = 'fin_plots/ForceCBF_Comparison';
+exportgraphics(forceCBF_plot, strcat(fname, '.png'), 'ContentType', 'vector');
 
 %% comparison of q0 and q1 for CD vs CBF
 traj_plot = figure;
@@ -428,6 +477,52 @@ grid on;
 
 fname = 'fin_plots/TrajectoryTracking_Comparison';
 exportgraphics(traj_plot, strcat(fname, '.png'), 'ContentType', 'vector');
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Tracking CD
+
+trajCD_plot = figure;
+
+subplot(2,1,1)
+fill(out1.q0.fillX, out1.q0.fillY, [0 0.4470 0.7410], 'FaceAlpha', 0.2, 'EdgeColor', 'none'); hold on
+
+p_r1 = plot(out1.time_ref, out1.reference.q(:,1), '-.', 'Color', [0.2 0.2 0.2], 'LineWidth', 2);
+
+p1 = plot(out1.time, out1.q0.mu, 'Color', [0 0.4470 0.7410], 'LineWidth', 1.5);
+
+xlabel('Time (s)','FontSize',15)
+ylabel('$q_0$ (radians)','FontSize',15)
+lgd = legend([p1, p_r1], {'CD','Reference'}, 'Location','best','FontSize',12);
+grid on;
+hold off
+
+subplot(2,1,2)
+fill(out1.q1.fillX, out1.q1.fillY, [0 0.4470 0.7410], 'FaceAlpha', 0.2, 'EdgeColor', 'none'); hold on
+
+p_r1 = plot(out1.time_ref, out1.reference.q(:,2), '-.', 'Color', [0.2 0.2 0.2], 'LineWidth', 2);
+
+p1 = plot(out1.time, out1.q1.mu, 'Color', [0 0.4470 0.7410], 'LineWidth', 1.5);
+
+xlabel('Time ($s$)','FontSize',15)
+ylabel('$q_1$ (radians)','FontSize',15)
+hold off
+
+% lgd.Units = 'normalized';       % Make position relative to axes
+% pos1 = lgd.Position;
+% pos1(1) = pos1(1) - 0;         % Move right
+% pos1(2) = pos1(2) + 0;         % Move up
+% lgd.Position = pos1;
+
+hw_ratio = 1.1;
+
+set(findall(trajCD_plot,'-property','Interpreter'), 'Interpreter', 'latex')
+set(findall(trajCD_plot,'-property','TickLabelInterpreter'), 'TickLabelInterpreter', 'latex')
+set(findall(trajCD_plot,'-property','Box'), 'Box', 'off')
+set(trajCD_plot, 'Units', 'centimeters', ...
+        'Position', [2.3 1 picturewidth_singlecolumn hw_ratio * picturewidth_singlecolumn]);
+grid on;
+
+fname = 'fin_plots/CDTrackingFP';
+exportgraphics(trajCD_plot, strcat(fname, '.png'), 'ContentType', 'vector');
 
 %% PD tuning results
 
