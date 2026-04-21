@@ -1,5 +1,5 @@
 
-function [time_vec, q, dq, ddq, smooth_q, smooth_dq, smooth_ddq, indexs, rho0] = ezloopdata_compare(data, doPlot, stepResponse, sinResponse, indexs)
+function [time_vec, q, dq, ddq, smooth_q, smooth_dq, smooth_ddq, indexs, rho0, ControlComp] = ezloopdata_compare(data, doPlot, stepResponse, sinResponse, indexs)
 % processEzLoopData  Load and process EZ-Loop ROS2 dataset
 %
 % INPUT
@@ -139,6 +139,8 @@ val3 = data.ValveOpening_3(startidx:endidx);
 %% Extract Command Inputs
 u0 = data.("u_t(0)")(startidx:endidx);
 u1 = data.("u_t(1)")(startidx:endidx);
+
+ControlComp = [abs_0 abs_1 abs_2 abs_3 u0 u1];
 
 %% Extract Force Measurements
 f0 = data.("ForcePlate_0"); % (forceplate in positive direction)

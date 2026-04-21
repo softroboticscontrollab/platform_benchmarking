@@ -36,23 +36,23 @@ k = 11.16;
 
 % Open-loop motion for dynamics calibration with amplitude of 100 and period of 200
 dat = 'manuscript_data/ezloophw_closedloop_ros2_reserv_pneumatics_2026-3-25_CalibrationRunV1.csv';
-[time_cal, q_cal, dq_cal, ddq_cal, smooth_q_cal, smooth_dq_cal, smooth_ddq_cal, calib_start,~] = ezloopdata_compare(dat, false, false, true, 0);
+[time_cal, q_cal, dq_cal, ddq_cal, smooth_q_cal, smooth_dq_cal, smooth_ddq_cal, calib_start,~,calib_cont] = ezloopdata_compare(dat, false, false, true, 0);
 
 % PD Tuning Results 
 dat = 'manuscript_data/ezloophw_closedloop_ros2_reserv_pneumatics_2026-3-26_PD1.csv'; 
-[time_PD1, q_PD1, dq_PD1, ddq_PD1, smooth_q_PD1, smooth_dq_PD1, smooth_ddq_PD1,~,~] = ezloopdata_compare(dat, false, false, true, 0);
+[time_PD1, q_PD1, dq_PD1, ddq_PD1, smooth_q_PD1, smooth_dq_PD1, smooth_ddq_PD1,~,~,~] = ezloopdata_compare(dat, false, false, true, 0);
 
 dat = 'manuscript_data/ezloophw_closedloop_ros2_reserv_pneumatics_2026-3-26_PD2.csv'; 
-[time_PD2, q_PD2, dq_PD2, ddq_PD2, smooth_q_PD2, smooth_dq_PD2, smooth_ddq_PD2,~,~] = ezloopdata_compare(dat, false, false, true, 0);
+[time_PD2, q_PD2, dq_PD2, ddq_PD2, smooth_q_PD2, smooth_dq_PD2, smooth_ddq_PD2,~,~,~] = ezloopdata_compare(dat, false, false, true, 0);
 
 dat = 'manuscript_data/ezloophw_closedloop_ros2_reserv_pneumatics_2026-3-26_PD3.csv'; 
-[time_PD3, q_PD3, dq_PD3, ddq_PD3, smooth_q_PD3, smooth_dq_PD3, smooth_ddq_PD3,~,~] = ezloopdata_compare(dat, false, false, true, 0);
+[time_PD3, q_PD3, dq_PD3, ddq_PD3, smooth_q_PD3, smooth_dq_PD3, smooth_ddq_PD3,~,~,~] = ezloopdata_compare(dat, false, false, true, 0);
 
 dat = 'manuscript_data/ezloophw_closedloop_ros2_reserv_pneumatics_2026-3-26_PD4.csv'; 
-[time_PD4, q_PD4, dq_PD4, ddq_PD4, smooth_q_PD4, smooth_dq_PD4, smooth_ddq_PD4,~,~] = ezloopdata_compare(dat, false, false, true, 0);
+[time_PD4, q_PD4, dq_PD4, ddq_PD4, smooth_q_PD4, smooth_dq_PD4, smooth_ddq_PD4,~,~,~] = ezloopdata_compare(dat, false, false, true, 0);
 
 dat = 'manuscript_data/ezloophw_closedloop_ros2_reserv_pneumatics_2026-3-26_PD5.csv'; 
-[time_PD5, q_PD5, dq_PD5, ddq_PD5, smooth_q_PD5, smooth_dq_PD5, smooth_ddq_PD5,~,~] = ezloopdata_compare(dat, false, false, true, 0);
+[time_PD5, q_PD5, dq_PD5, ddq_PD5, smooth_q_PD5, smooth_dq_PD5, smooth_ddq_PD5,~,~,~] = ezloopdata_compare(dat, false, false, true, 0);
 
 smooth_q_cells = {smooth_q_PD1, smooth_q_PD2, smooth_q_PD3, ...
                   smooth_q_PD4, smooth_q_PD5};
@@ -71,19 +71,19 @@ TunePD = ezloopdata_safetyplotter(smooth_q_cells, time_cells, time_step, smooth_
 
 % PD Attempt at Tracking Calibration 
 dat = 'manuscript_data/ezloophw_closedloop_ros2_reserv_pneumatics_2026-3-26_PDCal1.csv'; 
-[time_PDCal1, q_PDCal1, dq_PDCal1, ddq_PDCal1, smooth_q_PDCal1, smooth_dq_PDCal1, smooth_ddq_PDCal1,~,~] = ezloopdata_compare(dat, false, false, true, calib_start);
+[time_PDCal1, q_PDCal1, dq_PDCal1, ddq_PDCal1, smooth_q_PDCal1, smooth_dq_PDCal1, smooth_ddq_PDCal1,~,~,~] = ezloopdata_compare(dat, false, false, true, calib_start);
 
 dat = 'manuscript_data/ezloophw_closedloop_ros2_reserv_pneumatics_2026-3-26_PDCal2.csv'; 
-[time_PDCal2, q_PDCal2, dq_PDCal2, ddq_PDCal2, smooth_q_PDCal2, smooth_dq_PDCal2, smooth_ddq_PDCal2,~,~] = ezloopdata_compare(dat, false, false, true, calib_start);
+[time_PDCal2, q_PDCal2, dq_PDCal2, ddq_PDCal2, smooth_q_PDCal2, smooth_dq_PDCal2, smooth_ddq_PDCal2,~,~,~] = ezloopdata_compare(dat, false, false, true, calib_start);
 
 dat = 'manuscript_data/ezloophw_closedloop_ros2_reserv_pneumatics_2026-3-26_PDCal3.csv'; 
-[time_PDCal3, q_PDCal3, dq_PDCal3, ddq_PDCal3, smooth_q_PDCal3, smooth_dq_PDCal3, smooth_ddq_PDCal3,~,~] = ezloopdata_compare(dat, false, false, true, calib_start);
+[time_PDCal3, q_PDCal3, dq_PDCal3, ddq_PDCal3, smooth_q_PDCal3, smooth_dq_PDCal3, smooth_ddq_PDCal3,~,~,~] = ezloopdata_compare(dat, false, false, true, calib_start);
 
 dat = 'manuscript_data/ezloophw_closedloop_ros2_reserv_pneumatics_2026-3-26_PDCal4.csv'; 
-[time_PDCal4, q_PDCal4, dq_PDCal4, ddq_PDCal4, smooth_q_PDCal4, smooth_dq_PDCal4, smooth_ddq_PDCal4,~,~] = ezloopdata_compare(dat, false, false, true, calib_start);
+[time_PDCal4, q_PDCal4, dq_PDCal4, ddq_PDCal4, smooth_q_PDCal4, smooth_dq_PDCal4, smooth_ddq_PDCal4,~,~,~] = ezloopdata_compare(dat, false, false, true, calib_start);
 
 dat = 'manuscript_data/ezloophw_closedloop_ros2_reserv_pneumatics_2026-3-26_PDCal5.csv'; 
-[time_PDCal5, q_PDCal5, dq_PDCal5, ddq_PDCal5, smooth_q_PDCal5, smooth_dq_PDCal5, smooth_ddq_PDCal5,~,~] = ezloopdata_compare(dat, false, false, true, calib_start);
+[time_PDCal5, q_PDCal5, dq_PDCal5, ddq_PDCal5, smooth_q_PDCal5, smooth_dq_PDCal5, smooth_ddq_PDCal5,~,~,~] = ezloopdata_compare(dat, false, false, true, calib_start);
 
 smooth_q_cells = {smooth_q_PDCal1, smooth_q_PDCal2, smooth_q_PDCal3, ...
                   smooth_q_PDCal4, smooth_q_PDCal5};
@@ -96,19 +96,19 @@ CalibPD = ezloopdata_safetyplotter(smooth_q_cells, time_cells, time_cal, smooth_
 
 % CD Results tracking calib trajectory
 dat = 'manuscript_data/ezloophw_closedloop_ros2_reserv_pneumatics_2026-3-25_TrackCalib1.csv'; 
-[time_tra1, q_tra1, dq_tra1, ddq_tra1, smooth_q_tra1, smooth_dq_tra1, smooth_ddq_tra1,~,~] = ezloopdata_compare(dat, false, false, true, calib_start);
+[time_tra1, q_tra1, dq_tra1, ddq_tra1, smooth_q_tra1, smooth_dq_tra1, smooth_ddq_tra1,~,~,~] = ezloopdata_compare(dat, false, false, true, calib_start);
 
 dat = 'manuscript_data/ezloophw_closedloop_ros2_reserv_pneumatics_2026-3-25_TrackCalib2.csv'; 
-[time_tra2, q_tra2, dq_tra2, ddq_tra2, smooth_q_tra2, smooth_dq_tra2, smooth_ddq_tra2,~,~] = ezloopdata_compare(dat, false, false, true, calib_start);
+[time_tra2, q_tra2, dq_tra2, ddq_tra2, smooth_q_tra2, smooth_dq_tra2, smooth_ddq_tra2,~,~,~] = ezloopdata_compare(dat, false, false, true, calib_start);
 
 dat = 'manuscript_data/ezloophw_closedloop_ros2_reserv_pneumatics_2026-3-25_TrackCalib3.csv'; 
-[time_tra3, q_tra3, dq_tra3, ddq_tra3, smooth_q_tra3, smooth_dq_tra3, smooth_ddq_tra3,~,~] = ezloopdata_compare(dat, false, false, true, calib_start);
+[time_tra3, q_tra3, dq_tra3, ddq_tra3, smooth_q_tra3, smooth_dq_tra3, smooth_ddq_tra3,~,~,~] = ezloopdata_compare(dat, false, false, true, calib_start);
 
 dat = 'manuscript_data/ezloophw_closedloop_ros2_reserv_pneumatics_2026-3-25_TrackCalib4.csv'; 
-[time_tra4, q_tra4, dq_tra4, ddq_tra4, smooth_q_tra4, smooth_dq_tra4, smooth_ddq_tra4,~,~] = ezloopdata_compare(dat, false, false, true, calib_start);
+[time_tra4, q_tra4, dq_tra4, ddq_tra4, smooth_q_tra4, smooth_dq_tra4, smooth_ddq_tra4,~,~,~] = ezloopdata_compare(dat, false, false, true, calib_start);
 
 dat = 'manuscript_data/ezloophw_closedloop_ros2_reserv_pneumatics_2026-3-25_TrackCalib5.csv'; 
-[time_tra5, q_tra5, dq_tra5, ddq_tra5, smooth_q_tra5, smooth_dq_tra5, smooth_ddq_tra5,~,~] = ezloopdata_compare(dat, false, false, true, calib_start);
+[time_tra5, q_tra5, dq_tra5, ddq_tra5, smooth_q_tra5, smooth_dq_tra5, smooth_ddq_tra5,~,~,~] = ezloopdata_compare(dat, false, false, true, calib_start);
 
 smooth_q_cells = {smooth_q_tra1, smooth_q_tra2, smooth_q_tra3, ...
                   smooth_q_tra4, smooth_q_tra5};
@@ -135,23 +135,23 @@ CalibCD = ezloopdata_safetyplotter(smooth_q_cells, time_cells, time_cal, smooth_
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Teach-and-Repeat 4 trajectory
 dat = 'manuscript_data/ezloophw_closedloop_ros2_reserv_pneumatics_2026-3-26_TnR4.csv'; 
-[time_TnR4, q_TnR4, dq_TnR4, ddq_TnR4, smooth_q_TnR4,smooth_dq_TnR4,smooth_ddq_TnR4, index_TnR4, ~] = ezloopdata_compare(dat, false, false, false, 0);
+[time_TnR4, q_TnR4, dq_TnR4, ddq_TnR4, smooth_q_TnR4,smooth_dq_TnR4,smooth_ddq_TnR4, index_TnR4, ~,~] = ezloopdata_compare(dat, false, false, false, 0);
 
 % Inverse Dynamics Controller on TnR4 w/o forceplate
 dat = 'manuscript_data/ezloophw_closedloop_ros2_reserv_pneumatics_2026-3-26_TnR4CD1.csv'; 
-[time_CD1, q_CD1, dq_CD1, ddq_CD1, smooth_q_CD1, smooth_dq_CD1, smooth_ddq_CD1, ~, ~] = ezloopdata_compare(dat, false, false, false, index_TnR4);
+[time_CD1, q_CD1, dq_CD1, ddq_CD1, smooth_q_CD1, smooth_dq_CD1, smooth_ddq_CD1, ~, ~,~] = ezloopdata_compare(dat, false, false, false, index_TnR4);
 
 dat = 'manuscript_data/ezloophw_closedloop_ros2_reserv_pneumatics_2026-3-26_TnR4CD2.csv'; 
-[time_CD2, q_CD2, dq_CD2, ddq_CD2, smooth_q_CD2, smooth_dq_CD2, smooth_ddq_CD2, ~, ~] = ezloopdata_compare(dat, false, false, false, index_TnR4);
+[time_CD2, q_CD2, dq_CD2, ddq_CD2, smooth_q_CD2, smooth_dq_CD2, smooth_ddq_CD2, ~, ~,~] = ezloopdata_compare(dat, false, false, false, index_TnR4);
 
 dat = 'manuscript_data/ezloophw_closedloop_ros2_reserv_pneumatics_2026-3-26_TnR4CD3.csv'; 
-[time_CD3, q_CD3, dq_CD3, ddq_CD3, smooth_q_CD3, smooth_dq_CD3, smooth_ddq_CD3, ~, ~] = ezloopdata_compare(dat, false, false, false, index_TnR4);
+[time_CD3, q_CD3, dq_CD3, ddq_CD3, smooth_q_CD3, smooth_dq_CD3, smooth_ddq_CD3, ~, ~,~] = ezloopdata_compare(dat, false, false, false, index_TnR4);
 
 dat = 'manuscript_data/ezloophw_closedloop_ros2_reserv_pneumatics_2026-3-26_TnR4CD4.csv'; 
-[time_CD4, q_CD4, dq_CD4, ddq_CD4, smooth_q_CD4, smooth_dq_CD4, smooth_ddq_CD4, ~, ~] = ezloopdata_compare(dat, false, false, false, index_TnR4);
+[time_CD4, q_CD4, dq_CD4, ddq_CD4, smooth_q_CD4, smooth_dq_CD4, smooth_ddq_CD4, ~, ~,~] = ezloopdata_compare(dat, false, false, false, index_TnR4);
 
 dat = 'manuscript_data/ezloophw_closedloop_ros2_reserv_pneumatics_2026-3-26_TnR4CD5.csv'; 
-[time_CD5, q_CD5, dq_CD5, ddq_CD5, smooth_q_CD5, smooth_dq_CD5, smooth_ddq_CD5, ~, ~] = ezloopdata_compare(dat, false, false, false, index_TnR4);
+[time_CD5, q_CD5, dq_CD5, ddq_CD5, smooth_q_CD5, smooth_dq_CD5, smooth_ddq_CD5, ~, ~,~] = ezloopdata_compare(dat, false, false, false, index_TnR4);
 
 smooth_q_cells = {smooth_q_CD1, smooth_q_CD2, smooth_q_CD3, ...
                   smooth_q_CD4, smooth_q_CD5};
@@ -164,19 +164,19 @@ TnR = ezloopdata_safetyplotter(smooth_q_cells, time_cells, time_TnR4, smooth_q_T
 
 % Inverse Dynamics Controller on TnR4 w/ forceplate
 dat = 'manuscript_data/ezloophw_closedloop_ros2_reserv_pneumatics_2026-3-26_CD4FP1.csv'; 
-[time_CDFP1, q_CDFP1, dq_CDFP1, ddq_CDFP1, smooth_q_CDFP1, smooth_dq_CDFP1, smooth_ddq_CDFP1, ~, rho0_CDFP1] = ezloopdata_compare(dat, false, false, false, index_TnR4);
+[time_CDFP1, q_CDFP1, dq_CDFP1, ddq_CDFP1, smooth_q_CDFP1, smooth_dq_CDFP1, smooth_ddq_CDFP1, ~, rho0_CDFP1,~] = ezloopdata_compare(dat, false, false, false, index_TnR4);
  
 dat = 'manuscript_data/ezloophw_closedloop_ros2_reserv_pneumatics_2026-3-26_CD4FP2.csv'; 
-[time_CDFP2, q_CDFP2, dq_CDFP2, ddq_CDFP2, smooth_q_CDFP2, smooth_dq_CDFP2, smooth_ddq_CDFP2, ~, rho0_CDFP2] = ezloopdata_compare(dat, false, false, false, index_TnR4);
+[time_CDFP2, q_CDFP2, dq_CDFP2, ddq_CDFP2, smooth_q_CDFP2, smooth_dq_CDFP2, smooth_ddq_CDFP2, ~, rho0_CDFP2,~] = ezloopdata_compare(dat, false, false, false, index_TnR4);
 
 dat = 'manuscript_data/ezloophw_closedloop_ros2_reserv_pneumatics_2026-3-26_CD4FP3.csv'; 
-[time_CDFP3, q_CDFP3, dq_CDFP3, ddq_CDFP3, smooth_q_CDFP3, smooth_dq_CDFP3, smooth_ddq_CDFP3, ~, rho0_CDFP3] = ezloopdata_compare(dat, false, false, false, index_TnR4);
+[time_CDFP3, q_CDFP3, dq_CDFP3, ddq_CDFP3, smooth_q_CDFP3, smooth_dq_CDFP3, smooth_ddq_CDFP3, ~, rho0_CDFP3,~] = ezloopdata_compare(dat, false, false, false, index_TnR4);
 
 dat = 'manuscript_data/ezloophw_closedloop_ros2_reserv_pneumatics_2026-3-26_CD4FP4.csv'; 
-[time_CDFP4, q_CDFP4, dq_CDFP4, ddq_CDFP4, smooth_q_CDFP4, smooth_dq_CDFP4, smooth_ddq_CDFP4, ~, rho0_CDFP4] = ezloopdata_compare(dat, false, false, false, index_TnR4);
+[time_CDFP4, q_CDFP4, dq_CDFP4, ddq_CDFP4, smooth_q_CDFP4, smooth_dq_CDFP4, smooth_ddq_CDFP4, ~, rho0_CDFP4,~] = ezloopdata_compare(dat, false, false, false, index_TnR4);
 
 dat = 'manuscript_data/ezloophw_closedloop_ros2_reserv_pneumatics_2026-3-26_CD4FP5.csv'; 
-[time_CDFP5, q_CDFP5, dq_CDFP5, ddq_CDFP5, smooth_q_CDFP5, smooth_dq_CDFP5, smooth_ddq_CDFP5, ~, rho0_CDFP5] = ezloopdata_compare(dat, false, false, false, index_TnR4);
+[time_CDFP5, q_CDFP5, dq_CDFP5, ddq_CDFP5, smooth_q_CDFP5, smooth_dq_CDFP5, smooth_ddq_CDFP5, ~, rho0_CDFP5,~] = ezloopdata_compare(dat, false, false, false, index_TnR4);
 
 smooth_q_cells = {smooth_q_CDFP1, smooth_q_CDFP2, smooth_q_CDFP3, ...
                   smooth_q_CDFP4, smooth_q_CDFP5};
@@ -191,19 +191,19 @@ TnRCDFP = ezloopdata_safetyplotter(smooth_q_cells, time_cells, time_TnR4, smooth
 %% CBF Controller Response for High Conservative Case for Teach and Repeat 4
 
 dat = 'manuscript_data/ezloophw_closedloop_ros2_reserv_pneumatics_2026-3-26_TnR4CBFH1.csv'; 
-[time_H1, q_H1, dq_H1, ddq_H1, smooth_q_H1, smooth_dq_H1, smooth_ddq_H1, ~, rho0_H1] = ezloopdata_compare(dat, false, false, false, index_TnR4);
+[time_H1, q_H1, dq_H1, ddq_H1, smooth_q_H1, smooth_dq_H1, smooth_ddq_H1, ~, rho0_H1,~] = ezloopdata_compare(dat, false, false, false, index_TnR4);
  
 dat = 'manuscript_data/ezloophw_closedloop_ros2_reserv_pneumatics_2026-3-26_TnR4CBFH2.csv'; 
-[time_H2, q_H2, dq_H2, ddq_H2, smooth_q_H2, smooth_dq_H2, smooth_ddq_H2, ~, rho0_H2] = ezloopdata_compare(dat, false, false, false, index_TnR4);
+[time_H2, q_H2, dq_H2, ddq_H2, smooth_q_H2, smooth_dq_H2, smooth_ddq_H2, ~, rho0_H2,~] = ezloopdata_compare(dat, false, false, false, index_TnR4);
 
 dat = 'manuscript_data/ezloophw_closedloop_ros2_reserv_pneumatics_2026-3-26_TnR4CBFH3.csv'; 
-[time_H3, q_H3, dq_H3, ddq_H3, smooth_q_H3, smooth_dq_H3, smooth_ddq_H3, ~, rho0_H3] = ezloopdata_compare(dat, false, false, false, index_TnR4);
+[time_H3, q_H3, dq_H3, ddq_H3, smooth_q_H3, smooth_dq_H3, smooth_ddq_H3, ~, rho0_H3,~] = ezloopdata_compare(dat, false, false, false, index_TnR4);
 
 dat = 'manuscript_data/ezloophw_closedloop_ros2_reserv_pneumatics_2026-3-26_TnR4CBFH4.csv'; 
-[time_H4, q_H4, dq_H4, ddq_H4, smooth_q_H4, smooth_dq_H4, smooth_ddq_H4, ~, rho0_H4] = ezloopdata_compare(dat, false, false, false, index_TnR4);
+[time_H4, q_H4, dq_H4, ddq_H4, smooth_q_H4, smooth_dq_H4, smooth_ddq_H4, ~, rho0_H4,~] = ezloopdata_compare(dat, false, false, false, index_TnR4);
 
 dat = 'manuscript_data/ezloophw_closedloop_ros2_reserv_pneumatics_2026-3-26_TnR4CBFH5.csv'; 
-[time_H5, q_H5, dq_H5, ddq_H5, smooth_q_H5, smooth_dq_H5, smooth_ddq_H5, ~, rho0_H5] = ezloopdata_compare(dat, false, false, false, index_TnR4);
+[time_H5, q_H5, dq_H5, ddq_H5, smooth_q_H5, smooth_dq_H5, smooth_ddq_H5, ~, rho0_H5,~] = ezloopdata_compare(dat, false, false, false, index_TnR4);
 
 smooth_q_cells = {smooth_q_H1, smooth_q_H2, smooth_q_H3, ...
                   smooth_q_H4, smooth_q_H5};
@@ -242,6 +242,8 @@ xlabel('Time (s)','FontSize',15)
 ylabel('$q_0$ (radians)','FontSize',15)
 lgd = legend([p1, p_r1], {'Calibrated Simulation','Reference Data'}, 'Location','best','FontSize',12);
 xlim([0 sim_time(end)])
+ax = gca;
+ax.FontSize = 14;
 grid on;
 hold off
 
@@ -251,6 +253,8 @@ p1 = plot(sim_time, sim_q2_inter, 'Color', [0 0.4470 0.7410], 'LineWidth', 1.5);
 
 xlabel('Time (s)','FontSize',15)
 ylabel('$q_1$ (radians)','FontSize',15)
+ax = gca;
+ax.FontSize = 14;
 grid on;
 hold off
 
@@ -324,6 +328,8 @@ p3 = plot(out1.rho.time, out1.rho.max, '--r', 'LineWidth', 1.5);
 
 ylabel('Rho','FontSize',15);xlabel('Time ($s$)','FontSize',15)
 lgd = legend([p1,p2,p3],{'CD','CBF','Max Rho'},'Location','best','FontSize',12);
+ax = gca;
+ax.FontSize = 14;
 
 lgd.Units = 'normalized';       % Make position relative to axes
 pos1 = lgd.Position;
@@ -360,6 +366,8 @@ p3 = plot(out1.time, F_max, '--r', 'LineWidth', 1.5);
 
 ylabel('Force ($N$)','FontSize',15);xlabel('Time ($s$)','FontSize',15)
 lgd = legend([p1,p2,p3],{'CD','CBF','Max Force'},'Location','best','FontSize',12);
+ax = gca;
+ax.FontSize = 14;
 
 hold off
 
@@ -386,6 +394,8 @@ p3 = plot(out1.time, F_max, '--r', 'LineWidth', 1.5);
 
 ylabel('Force ($N$)','FontSize',15);xlabel('Time ($s$)','FontSize',15)
 lgd = legend([p1,p3],{'CD','Max Force'},'Location','best','FontSize',12);
+ax = gca;
+ax.FontSize = 14;
 
 hold off
 
@@ -414,6 +424,8 @@ p3 = plot(out1.time, F_max, '--r', 'LineWidth', 1.5);
 
 ylabel('Force ($N$)','FontSize',15);xlabel('Time ($s$)','FontSize',15)
 lgd = legend([p2,p3],{'CBF','Max Force'},'Location','best','FontSize',12);
+ax = gca;
+ax.FontSize = 14;
 
 hold off
 
@@ -444,6 +456,8 @@ p2 = plot(out2.time, out2.q0.mu, 'Color', [0.8500 0.3250 0.0980], 'LineWidth', 1
 xlabel('Time (s)','FontSize',15)
 ylabel('$q_0$ (radians)','FontSize',15)
 lgd = legend([p1, p2, p_r1], {'CD','CBF','Reference'}, 'Location','best','FontSize',12);
+ax = gca;
+ax.FontSize = 14;
 grid on;
 hold off
 
@@ -458,13 +472,9 @@ p2 = plot(out2.time, out2.q1.mu, 'Color', [0.8500 0.3250 0.0980], 'LineWidth', 1
 
 xlabel('Time ($s$)','FontSize',15)
 ylabel('$q_1$ (radians)','FontSize',15)
+ax = gca;
+ax.FontSize = 14;
 hold off
-
-% lgd.Units = 'normalized';       % Make position relative to axes
-% pos1 = lgd.Position;
-% pos1(1) = pos1(1) - 0;         % Move right
-% pos1(2) = pos1(2) + 0;         % Move up
-% lgd.Position = pos1;
 
 hw_ratio = 1.1;
 
@@ -492,6 +502,8 @@ p1 = plot(out1.time, out1.q0.mu, 'Color', [0 0.4470 0.7410], 'LineWidth', 1.5);
 xlabel('Time (s)','FontSize',15)
 ylabel('$q_0$ (radians)','FontSize',15)
 lgd = legend([p1, p_r1], {'CD','Reference'}, 'Location','best','FontSize',12);
+ax = gca;
+ax.FontSize = 14;
 grid on;
 hold off
 
@@ -504,6 +516,8 @@ p1 = plot(out1.time, out1.q1.mu, 'Color', [0 0.4470 0.7410], 'LineWidth', 1.5);
 
 xlabel('Time ($s$)','FontSize',15)
 ylabel('$q_1$ (radians)','FontSize',15)
+ax = gca;
+ax.FontSize = 14;
 hold off
 
 % lgd.Units = 'normalized';       % Make position relative to axes
@@ -537,6 +551,8 @@ xlabel('Time (s)','FontSize',15)
 ylabel('$q_0$ (radians)','FontSize',15)
 lgd = legend([p1, p_r1], {'PD','Reference'}, 'Location','best','FontSize',12);
 xlim([0 TunePD.time_ref(end)])
+ax = gca;
+ax.FontSize = 14;
 grid on;
 hold off
 
@@ -547,6 +563,8 @@ p1 = plot(TunePD.time, TunePD.q1.mu, 'Color', [0 0.4470 0.7410], 'LineWidth', 1.
 
 xlabel('Time (s)','FontSize',15)
 ylabel('$q_1$ (radians)','FontSize',15)
+ax = gca;
+ax.FontSize = 14;
 grid on;
 hold off
 
@@ -576,6 +594,8 @@ xlabel('Time (s)','FontSize',15)
 ylabel('$q_0$ (radians)','FontSize',15)
 lgd = legend([p1, p_r1], {'PD','Reference'}, 'Location','best','FontSize',12);
 xlim([0 CalibPD.time_ref(end)])
+ax = gca;
+ax.FontSize = 14;
 grid on;
 hold off
 
@@ -586,6 +606,8 @@ p1 = plot(CalibPD.time, CalibPD.q1.mu, 'Color', [0 0.4470 0.7410], 'LineWidth', 
 
 xlabel('Time (s)','FontSize',15)
 ylabel('$q_1$ (radians)','FontSize',15)
+ax = gca;
+ax.FontSize = 14;
 grid on;
 hold off
 
@@ -615,6 +637,8 @@ xlabel('Time (s)','FontSize',15)
 ylabel('$q_0$ (radians)','FontSize',15)
 lgd = legend([p1, p_r1], {'CD','Reference'}, 'Location','best','FontSize',12);
 xlim([0 CalibCD.time_ref(end)])
+ax = gca;
+ax.FontSize = 14;
 grid on;
 hold off
 
@@ -625,6 +649,8 @@ p1 = plot(CalibCD.time, CalibCD.q1.mu, 'Color', [0 0.4470 0.7410], 'LineWidth', 
 
 xlabel('Time (s)','FontSize',15)
 ylabel('$q_1$ (radians)','FontSize',15)
+ax = gca;
+ax.FontSize = 14;
 grid on;
 hold off
 
@@ -653,6 +679,8 @@ p1 = plot(TnR.time, TnR.q0.mu, 'Color', [0 0.4470 0.7410], 'LineWidth', 1.5);
 xlabel('Time (s)','FontSize',15)
 ylabel('$q_0$ (radians)','FontSize',15)
 lgd = legend([p1, p_r1], {'CD','Reference'}, 'Location','best','FontSize',12);
+ax = gca;
+ax.FontSize = 14;
 xlim([0 TnR.time_ref(end)])
 grid on;
 hold off
@@ -664,6 +692,8 @@ p1 = plot(TnR.time, TnR.q1.mu, 'Color', [0 0.4470 0.7410], 'LineWidth', 1.5);
 
 xlabel('Time (s)','FontSize',15)
 ylabel('$q_1$ (radians)','FontSize',15)
+ax = gca;
+ax.FontSize = 14;
 grid on;
 hold off
 
@@ -679,3 +709,47 @@ grid on;
 
 fname = 'fin_plots/CDTnRTracking';
 exportgraphics(cdtnr_plot, strcat(fname, '.png'), 'ContentType', 'vector');
+
+%% Results from Low level tunning, how close can we follow control input
+
+cont_plot = figure;
+
+frs_limb = [calib_cont((1:length(time_cal)/2),1) ; -1*calib_cont((length(time_cal)/2+1):end,2)];
+sec_limb = [calib_cont((1:length(time_cal)/2),3) ; -1*calib_cont((length(time_cal)/2+1):end,4)];
+
+subplot(2,1,1)
+p1 = plot(time_cal,frs_limb,'Color', [1 0 0], 'LineWidth', 1.5); hold on 
+p3 = plot(time_cal,calib_cont(:,5), '-.', 'Color', [0.2 0.2 0.2], 'LineWidth', 2);
+
+xlabel('Time (s)','FontSize',15)
+ylabel('$u$ (hPa)','FontSize',15)
+lgd = legend([p1, p3], {'$u$ measured','$u$ commanded'}, 'Location','best','FontSize',12);
+ax = gca;
+ax.FontSize = 14;
+xlim([0 time_cal(end)])
+grid on;
+hold off
+
+subplot(2,1,2)
+p1 = plot(time_cal,sec_limb,'Color', [1 0 0], 'LineWidth', 1.5); hold on 
+p3 = plot(time_cal,calib_cont(:,6), '-.', 'Color', [0.2 0.2 0.2], 'LineWidth', 2);
+
+xlabel('Time (s)','FontSize',15)
+ylabel('$u$ (hPa)','FontSize',15)
+lgd = legend([p1, p3], {'$u$ measured','$u$ commanded'}, 'Location','best','FontSize',12);
+ax = gca;
+ax.FontSize = 14;
+xlim([0 time_cal(end)])
+grid on;
+hold off
+
+hw_ratio = 1.1;
+
+set(findall(cont_plot,'-property','Interpreter'), 'Interpreter', 'latex')
+set(findall(cont_plot,'-property','TickLabelInterpreter'), 'TickLabelInterpreter', 'latex')
+set(findall(cont_plot,'-property','Box'), 'Box', 'off')
+set(cont_plot, 'Units', 'centimeters', ...
+        'Position', [2.3 1 picturewidth_singlecolumn hw_ratio * picturewidth_singlecolumn]);
+
+fname = 'fin_plots/LowLevelTuningCon';
+exportgraphics(cont_plot, strcat(fname, '.png'), 'ContentType', 'vector');
