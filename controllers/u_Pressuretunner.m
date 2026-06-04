@@ -13,7 +13,7 @@ phase = mod(t, T);
 %     u = [0;0];
 % end
 
-u = [0;0];
+u = [60;0];
 
 % u = [52.0741;44.9907]; % useful for gathering data for teach_and_repeat
 

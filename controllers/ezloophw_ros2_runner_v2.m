@@ -99,11 +99,11 @@ c.Kd_ct = Kd_ct;
 % which controller to choose. This is the combined controller, both nom and
 % safe supervisor.
 
-% ctrlr = @u_Pressuretunner;
+ctrlr = @u_Pressuretunner;
 
 % ctrlr = @u_pd_control;
 
-ctrlr = @u_pd_control_trajectory;
+% ctrlr = @u_pd_control_trajectory;
 
 % ctrlr = @u_computed_torque_control;
 

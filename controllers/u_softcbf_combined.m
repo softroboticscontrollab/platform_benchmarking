@@ -10,15 +10,15 @@ function u = u_softcbf_combined(x, constants, t)
 %       t == timestep. This is an open-loop controller, so we need to know
 %       the time of the simulation.
 
-nom_ctrlr = @u_computed_torque_control;
-% nom_ctrlr = @u_babblesine;
+% nom_ctrlr = @u_computed_torque_control;
+nom_ctrlr = @u_babblesine;
 
 supervisor = @soft_u_cbf_polygonal_safeset;
 
 % two stages. First, the nominal controller.
 % Assume the nominal controller takes arguments this way.
-u_nom = nom_ctrlr(x, constants, t);
-% u_nom = nom_ctrlr(t, constants);
+% u_nom = nom_ctrlr(x, constants, t);
+u_nom = nom_ctrlr(t, constants);
 % u_nom = 50 + nom_ctrlr(t, constants);
 %  u_nom = abs(nom_ctrlr(t, constants));
 
@@ -32,8 +32,8 @@ disp("Control before supervisor:");
 disp(u_nom);
 
 % Assume the supervisor takes arguments this way.
-u = supervisor(u_nom, x, constants);
-% u = u_nom; % ignores the CBF completely 
+% u = supervisor(u_nom, x, constants);
+u = u_nom; % ignores the CBF completely 
 %
 disp("Control after supervisor:");
 disp(u);
