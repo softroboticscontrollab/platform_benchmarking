@@ -4,52 +4,80 @@
 #include "PumpController.h"
 #include "ABValve.h"
 #include "ProportionalValveController.h"
-#include "FilterBank.h"
 
-// TODO: in proportional class, examine if the target pressure is beyond the bottle pressure. If so, warn and set to max.
-// TODO: add flag to set a 1030hpa baseline for each limb segment at the beginning
-// TODO: arrange the flags for readability
 
-// Note: input should be in the format: <p1,p2,p3,p4> /n. Only "," as separator, no spaces, and must be a seaparated line
-// output: [MPR]: <p1> <p2> <p3> <p4> /n
+/**
+ * @file main.cpp
+ * @brief Main hardware control program for a 2-segment bidirectional pneumatic limb.
+ *
+ * This program runs on the microcontroller using the Arduino framework through
+ * PlatformIO. It controls the pneumatic hardware by:
+ *
+ * 1. Reading pressure values from multiple pressure sensors.
+ * 2. Maintaining the reservoir/bottle pressure using a pump controller.
+ * 3. Receiving target chamber pressures from the host computer through Serial.
+ * 4. Mapping target pressures for paired bidirectional limb chambers.
+ * 5. Updating proportional valve commands using PI control.
+ * 6. Streaming measured pressures and valve aperture values back over Serial.
+ *
+ * Serial input format:
+ *
+ *   <p1,p2,p3,p4>
+ *
+ * where p1-p4 are target pressures in hPa. The message must:
+ * - start with '<'
+ * - end with '>'
+ * - use commas as separators
+ * - contain no spaces
+ *
+ * Example:
+ *
+ *   <1010,1100,1010,1080>
+ *
+ * Serial output format:
+ *
+ *   [MPR]: p1 p2 p3 p4
+ *   [RPR]: p_reservoir
+ *   [VAL]: v1 v2 v3 v4
+ *
+ * where:
+ * - MPR contains measured chamber pressures in hPa
+ * - RPR contains measured reservoir pressure in hPa
+ * - VAL contains normalized valve aperture commands in the range [0, 1]
+ *
+ * Notes:
+ * - This file is intended as the main runtime controller.
+ * - PI controller tuning utilities are provided separately under test/.
+ * - PlatformIO expects the executable entry point to be named src/main.cpp.
+ */
 
 
 // **Global Parameters Define**
 const float Ts_ms = 50.0f; // controller sampling time in milliseconds
-const float sample_interval_ms = 20.0f;  // for filter, 10ms = 100Hz
-const float sampling_freq_Hz = 1000.0f / sample_interval_ms;  // sampling frequency in Hz
-const float cutoff_freq_Hz = 3.0f;  // cutoff frequency in Hz for Butterworth filter
-float desiredBottlePressure = 1400.0f; // desired pressure in hPa in bottle
-float achievablePressure = 1250.0f; // achievable chamber pressure in hPa
+float desiredBottlePressure = 1400.0f; // desired pressure in hPa in bottle (reservoir).
+float achievablePressure = 1250.0f; // achievable chamber pressure in hPa in the limbs, to avoid target pressure beyond the capability of the system. This is used for input validation.
 float initialLimbPressure = 1010.0f; // dummy initial pressure for each limb segment in hPa
 String sprefix1 = "MPR"; // for pressure sensor in chambers
 String sprefix2 = "RPR"; // for pressure sensor in reservoir
 String sprefix3 = "VAL"; // for valve apertures
 const int BUFSIZE = 200;  // buffer size for serial communication
 float Kp[4] = {30.0f, 31.0f, 32.0f, 31.0f}; // Proportional gain for each valve
-float Ki[4] = {12.0f, 12.0f, 14.0f, 12.0f}; // {12.0f, 12.0f, 14.0f, 12.0f} Integral gain for each valve 9
+float Ki[4] = {12.0f, 12.0f, 14.0f, 12.0f}; // Integral gain for each valve 
 float val_apertures[4] = {0.0f,0.0f,0.0f,0.0f}; // For collection of valve aperture values
 
 // **Global Objects Define**
-PressureMux mutiSensor_test;
-PumpController pump1_control(5,Ts_ms); // pump connected to pin 8
+PressureMux mutiSensor; 
+PumpController pump1_control(5,Ts_ms); // pump connected to pin 5
 ABValve abValve1(46, 24, 47, 25); // valves connected to pins 
 ProportionalValveController propValve_control(abValve1, desiredBottlePressure, Ts_ms, Kp, Ki);
-FilterBank filters[4] = {
-    FilterBank(sampling_freq_Hz, cutoff_freq_Hz),  // P1
-    FilterBank(sampling_freq_Hz, cutoff_freq_Hz),  // P2
-    FilterBank(sampling_freq_Hz, cutoff_freq_Hz),  // P3
-    FilterBank(sampling_freq_Hz, cutoff_freq_Hz)   // P4
-}; 
+
 
 // **Global variables**
 unsigned long previousMillis;
 unsigned long currentMillis;
-unsigned long lastSampleTime = 0;   // for filter timing
 float initialPressure;    // Detect today's atm to set baseline for the target pressures 
 float targetPressure [4] = {initialLimbPressure, initialLimbPressure, initialLimbPressure, initialLimbPressure}; 
 float previousPressure [4] = {initialLimbPressure, initialLimbPressure, initialLimbPressure, initialLimbPressure};
-float filteredPressure [4] = {initialLimbPressure, initialLimbPressure, initialLimbPressure, initialLimbPressure};
 char receivedChars[BUFSIZE];
 char tempChars[BUFSIZE]; // temporary array for use when parsing
 
@@ -61,8 +89,16 @@ bool recvWithStartEndMarkers();
 void parseData();
 
 // **Flags**
-bool isPairLimbs = true; // true: input <p1, p2> and <p3, p4> are two limb segments. Will do target presssure mapping based on today's atm. false: input <p1, p2, p3, p4> are four independent limb segments.
-bool isFilter = false; // true: enable low-pass filter. false: disable the filter.
+
+// Flag indicating whether chambers form bidirectional limb pairs.
+// In paired mode (true):
+//   - Each limb consists of two opposing chambers
+//   - One chamber inflates while the other deflates
+//   - Pressure commands are interpreted as differential offsets from atmospheric pressure
+//
+// In unpaired mode (false):
+//   - All chambers are controlled independently with direct pressure targets
+bool isPairLimbs = true; 
 
 void setup(){
 
@@ -70,7 +106,7 @@ void setup(){
   Wire.begin();
 
   // (1). Initialize all hardware modules
-  mutiSensor_test.setup();
+  mutiSensor.setup();
   pump1_control.setup();
   abValve1.setup();
   propValve_control.setup();
@@ -81,29 +117,16 @@ void setup(){
     Serial.println("Warming up pressure sensors...");
     // read 10 times to let sensors stabilize
     for (int i = 0; i < 10; i++) {
-        mutiSensor_test.getAllPressure();
+        mutiSensor.getAllPressure();
         delay(50);  // 50ms delay between readings
     }
     // take the last average as today's atmospheric pressure
-    initialPressure = 0.25f * (mutiSensor_test.pump1_hPa +
-                               mutiSensor_test.pump2_hPa +
-                               mutiSensor_test.pump3_hPa +
-                               mutiSensor_test.pump4_hPa);
+    initialPressure = 0.25f * (mutiSensor.pump1_hPa +
+                               mutiSensor.pump2_hPa +
+                               mutiSensor.pump3_hPa +
+                               mutiSensor.pump4_hPa);
     propValve_control.setNominalZeroPressure(initialPressure + 1.0f);
     Serial.println("Today's atmospheric pressure detected: " + String(initialPressure) + " hPa");
-  }
-
-  // (2.2) If isFilter, use another set of gains
-  if (isFilter){
-    Kp[0] = 17.0f;  
-    Kp[1] = 18.0f;
-    Kp[2] = 25.0f;
-    Kp[3] = 25.0f;
-    Ki[0] = 4.5f;
-    Ki[1] = 8.0f;
-    Ki[2] = 10.0f;
-    Ki[3] = 10.0f;  // decrease gains to avoid over-sensitivity which may cause oscillations
-    propValve_control.setGains(Kp, Ki);
   }
 
   // (3). Set initial pressure
@@ -117,39 +140,19 @@ void setup(){
 
 void loop(){
   currentMillis = millis();
-  
-  // Loop 1:Filter Sampling
-  if (isFilter && (currentMillis - lastSampleTime >= sample_interval_ms)) {
-    lastSampleTime = currentMillis;
-    // Read all pressures
-    mutiSensor_test.getAllPressure(); 
-    // Apply Butterworth filter
-    filteredPressure[0] = filters[0].filter1st(mutiSensor_test.pump1_hPa);
-    filteredPressure[1] = filters[1].filter1st(mutiSensor_test.pump2_hPa);
-    filteredPressure[2] = filters[2].filter1st(mutiSensor_test.pump3_hPa);
-    filteredPressure[3] = filters[3].filter1st(mutiSensor_test.pump4_hPa);
-  }
 
-  // Loop 2: Controller loop
+  // Loop 1: Controller loop
   if (currentMillis - previousMillis >= Ts_ms) {
     previousMillis = currentMillis;
 
     // (1). Read all pressures and send over Serial
     float currP1 = 0, currP2 = 0, currP3 = 0, currP4 = 0, currP5 = 0;
-    if (isFilter){  // take the newest filtered value
-      currP1 = filteredPressure[0];
-      currP2 = filteredPressure[1];
-      currP3 = filteredPressure[2];
-      currP4 = filteredPressure[3];
-    }
-    else {
-      mutiSensor_test.getAllPressure(); 
-      currP1 = mutiSensor_test.pump1_hPa;
-      currP2 = mutiSensor_test.pump2_hPa;
-      currP3 = mutiSensor_test.pump3_hPa;
-      currP4 = mutiSensor_test.pump4_hPa;
-      currP5 = mutiSensor_test.bottle_hPa;
-    }
+    mutiSensor.getAllPressure(); 
+    currP1 = mutiSensor.pump1_hPa;
+    currP2 = mutiSensor.pump2_hPa;
+    currP3 = mutiSensor.pump3_hPa;
+    currP4 = mutiSensor.pump4_hPa;
+    currP5 = mutiSensor.bottle_hPa;
     datatx(String(currP1) + " " +
             String(currP2) + " " +
             String(currP3) + " " +
@@ -158,8 +161,8 @@ void loop(){
     datatx(String(currP5), sprefix2);        
 
     // (2). Update pump controller for bottle pressure
-    mutiSensor_test.getAllPressure();
-    float curr_bottlePress = mutiSensor_test.bottle_hPa;
+    mutiSensor.getAllPressure();
+    float curr_bottlePress = mutiSensor.bottle_hPa;
     pump1_control.update(desiredBottlePressure, curr_bottlePress);
 
     // (3). Calculate target pressures for four limbs and update proportional valve controller
@@ -182,9 +185,7 @@ void loop(){
           String(val_apertures[3]), sprefix3);    
     }
 
-
-
-    // Loop 3: Read the Serial input for new target pressures
+    // Loop 2: Read the Serial input for new target pressures
     if (recvWithStartEndMarkers()) {
     strcpy(tempChars, receivedChars); // temporary copy because strtok() used in parseData() replaces the commas with \0
     parseData();
@@ -199,8 +200,8 @@ void setPumpInitialPressure(float targetPressure_hPa) {
   unsigned long start = millis();
   while (1)
   {
-    mutiSensor_test.getAllPressure();
-    float curr_bottlePress = mutiSensor_test.bottle_hPa;
+    mutiSensor.getAllPressure();
+    float curr_bottlePress = mutiSensor.bottle_hPa;
     pump1_control.update(targetPressure_hPa, curr_bottlePress);
     if (abs(curr_bottlePress - targetPressure_hPa) < 20.0f) {
       Serial.println("Initial bottle pressure achieved.");

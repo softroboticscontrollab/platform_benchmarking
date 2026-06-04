@@ -3,14 +3,38 @@
 #include "PumpController.h"
 #include "ABValve.h"
 
+/***************** 
+ * @file Unit2_ABValve.cpp
+ * @brief Test program for the ABValve class.  
+ * 
+ * This is a unit test for the ABValve class. 
+ * 
+ * This program initializes the ABValve to control 4 valves connected to specified pins. 
+ * The program listens for Serial commands to turn individual valves on or off. 
+ * The expected Serial command format is:
+ *   V<idx><state>
+ * where:
+ *   - 'V' is the command prefix for valve control
+ *   - <idx> is the valve index (1-4)
+ *   - <state> is the desired state (0 for off, 1 for on)
+ *
+ * Example command to turn valve 2 on:
+ *   V21
+ *
+ * Example command to turn valve 3 off:
+ *   V30
+ *
+ * The program also allows printing current pressure readings from all sensors by sending the command 'R'.
+ */
 
-PressureMux mutiSensor_test;
-PumpController pump1_control(8); // pump connected to pin 8
-ABValve abValve1(9, 10, 11, 12); // valves connected to pins 
 
-const unsigned long Ts_mux_ms = 50; // sensor sampling period
+const unsigned long Ts_mux_ms = 100; // sensor sampling period
 unsigned long last_mux_ms = 0;
 bool achieve = 0; // whether desired pressure is achieved
+
+PressureMux mutiSensor_test;
+PumpController pump1_control(5, Ts_mux_ms); // pump connected to pin 5
+ABValve abValve1(9, 10, 11, 12); // valves connected to pins 
 
 
 void setup(){

@@ -4,9 +4,33 @@
 #include "ABValve.h"
 #include "ProportionalValveController.h"
 
-// TODO: in the setup(), make the bottle achieve the target pressure first
-// TODO: in proportional class, examine if the target pressure is beyond the bottle pressure. If so, warn and set to max.
-// TODO: make sure we receive the same data input from the python. Think about using Juan's Parse Function.
+/***************** 
+ * @file Unit3_propValve.cpp
+ * @brief Test program for the ProportionalValveController class.  
+ * 
+ * This is a unit test for the ProportionalValveController class. 
+ * 
+ * This program initializes the ProportionalValveController with specified parameters 
+ * and simulates a control loop where it updates the valve commands based on desired and current pressures. 
+ * 
+ * The program also includes a serial command interface for testing:
+ * - 'R' - Read and print all pressures
+ * - 'D' - Compare target pressures and current pressures, and print the results
+ * - 'V__' - Valve control command, where __ are two digits:
+ *        First digit: valve index (1-4)
+ *       Second digit: valve state (0: off, 1: on)
+ *       
+ *        Example: 
+ *        - 'V11' turns valve 1 ON
+ *        - 'V20' turns valve 2 OFF
+ * 
+ * - 'P' - Print the current DAC outputs for the proportional valves
+ * 
+ * 
+ * Note: This test assumes that the PressureMux and PumpController are functioning correctly, 
+ * as it relies on their outputs to test the ProportionalValveController.
+ */
+
 
 
 // Global parameters
@@ -16,13 +40,15 @@ float achievablePressure = 1300.0f; // achievable bottle pressure in hPa
 float ATM_PRESSURE_HPA = 1014.25f; // atmospheric pressure in hPa
 float diffP12 = 0.0f; // desired pressure difference between limb 1 and limb 2 in hPa
 float diffP34 = 0.0f; // desired pressure difference between limb 3 and limb 4 in hPa
+float Kp[4] = {30.0f, 31.0f, 32.0f, 31.0f}; // Proportional gain for each valve
+float Ki[4] = {12.0f, 12.0f, 14.0f, 12.0f}; // Integral gain for each valve 
 
 
 // Global objects
 PressureMux mutiSensor_test;
 PumpController pump1_control(8,Ts_ms); // pump connected to pin 8
 ABValve abValve1(9, 10, 11, 12); // valves connected to pins 
-ProportionalValveController propValve_control(abValve1, desiredPressure, Ts_ms); // bottle pressure 2000 hPa
+ProportionalValveController propValve_control(abValve1, desiredPressure, Ts_ms, Kp, Ki); // bottle pressure 2000 hPa
 
 // Global variables and functions
 unsigned long previousMillis;

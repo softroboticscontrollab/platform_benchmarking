@@ -2,12 +2,29 @@
 #include "MutiPressure.h"
 #include "PumpController.h"
 
+/**
+ * @file Unit1_mutiPressure&PumpTest.cpp
+ * @brief Test program for the PressureMux and PumpController classes.  
+ * 
+ * This is a unit test for the PressureMux and PumpController classes. 
+ * 
+ * This program initializes the PressureMux to read from multiple pressure sensors 
+ * and uses the PumpController to maintain a desired pressure in the reservoir/bottle. 
+ * The program periodically reads the current bottle pressure and updates the pump control output 
+ * to achieve a specified target pressure. 
+ * Debug information about the current bottle pressure 
+ * and whether the target pressure has been achieved is printed to Serial.
+ * 
+ */
 
-PressureMux mutiSensor_test;
-PumpController pump1_control(8); // pump connected to pin 8
 const unsigned long Ts_mux_ms = 50; // sensor sampling period
 unsigned long last_mux_ms = 0;
 bool achieve = 0; // whether desired pressure is achieved
+float kp_test = 13.0f; // P gain for pump controller test
+float ki_test = 1.0f; // I gain for pump controller test
+
+PressureMux mutiSensor_test;
+PumpController pump1_control(5, Ts_mux_ms, kp_test, ki_test); // pump connected to pin 5
 
 
 void setup(){
@@ -16,7 +33,7 @@ void setup(){
 };
 
 void loop(){
-  //mutiSensor_test.loop(1000); // read and print every 1 second
+ 
   unsigned long now = millis();
   if (now - last_mux_ms >= Ts_mux_ms) {
     last_mux_ms = now;
