@@ -1,5 +1,5 @@
 function out = ezloopdata_safetyplotter( ...
-    smooth_q_cells, time_cells, time_ref, q_ref, includeRho, rho_cells, doPlot)
+    smooth_q_cells, time_cells, time_ref, q_ref, includeRho, rho_cells, doPlot, smooth_dq_cells, u_cells)
 
 % plotCDFPTracking
 % Computes mean and ±2σ envelopes for multiple experiments and optionally plots them.
@@ -22,6 +22,15 @@ lengths = zeros(nRuns,1);
 
 for i = 1:nRuns
     lengths(i) = size(smooth_q_cells{i},1);
+
+    if ~isempty(smooth_dq_cells)
+        lengths(i) = min(lengths(i), size(smooth_dq_cells{i},1));
+    end
+
+    if ~isempty(u_cells)
+        lengths(i) = min(lengths(i), size(u_cells{i},1));
+    end
+
 end
 
 % Include rho lengths if rho is used
@@ -47,9 +56,27 @@ for i = 1:nRuns
     q1_all(:,i) = smooth_q_cells{i}(1:endpoint,2);
 end
 
+dq0_all = zeros(endpoint,nRuns);
+dq1_all = zeros(endpoint,nRuns);
+
+u0_all = zeros(endpoint,nRuns);
+u1_all = zeros(endpoint,nRuns);
+
+for i = 1:nRuns
+    dq0_all(:,i) = smooth_dq_cells{i}(1:endpoint,1);
+    dq1_all(:,i) = smooth_dq_cells{i}(1:endpoint,2);
+
+    u0_all(:,i) = u_cells{i}(1:endpoint,1);
+    u1_all(:,i) = u_cells{i}(1:endpoint,2);
+end
+
 %% Store raw matrices
 out.raw.q0_all = q0_all;
 out.raw.q1_all = q1_all;
+out.raw.dq0_all = dq0_all;
+out.raw.dq1_all = dq1_all;
+out.raw.u0_all  = u0_all;
+out.raw.u1_all  = u1_all;
 
 %% Statistics for q0 and q1
 q0_mu = mean(q0_all,2);
@@ -64,6 +91,19 @@ q0_lower = q0_mu - 2*q0_sigma;
 q1_upper = q1_mu + 2*q1_sigma;
 q1_lower = q1_mu - 2*q1_sigma;
 
+%% Statistics for dq0 and dq1
+dq0_mu = mean(dq0_all,2);
+dq0_sigma = std(dq0_all,0,2);
+
+dq1_mu = mean(dq1_all,2);
+dq1_sigma = std(dq1_all,0,2);
+
+dq0_upper = dq0_mu + 2*dq0_sigma;
+dq0_lower = dq0_mu - 2*dq0_sigma;
+
+dq1_upper = dq1_mu + 2*dq1_sigma;
+dq1_lower = dq1_mu - 2*dq1_sigma;
+
 %% Store q statistics
 out.q0.mu = q0_mu;
 out.q0.sigma = q0_sigma;
@@ -74,6 +114,41 @@ out.q1.mu = q1_mu;
 out.q1.sigma = q1_sigma;
 out.q1.upper = q1_upper;
 out.q1.lower = q1_lower;
+
+out.dq0.mu = dq0_mu;
+out.dq0.sigma = dq0_sigma;
+out.dq0.upper = dq0_upper;
+out.dq0.lower = dq0_lower;
+
+out.dq1.mu = dq1_mu;
+out.dq1.sigma = dq1_sigma;
+out.dq1.upper = dq1_upper;
+out.dq1.lower = dq1_lower;
+
+%% Statistics for u0 and u1
+u0_mu = mean(u0_all,2);
+u0_sigma = std(u0_all,0,2);
+
+u1_mu = mean(u1_all,2);
+u1_sigma = std(u1_all,0,2);
+
+u0_upper = u0_mu + 2*u0_sigma;
+u0_lower = u0_mu - 2*u0_sigma;
+
+u1_upper = u1_mu + 2*u1_sigma;
+u1_lower = u1_mu - 2*u1_sigma;
+
+%% Store u statistics
+
+out.u0.mu = u0_mu;
+out.u0.sigma = u0_sigma;
+out.u0.upper = u0_upper;
+out.u0.lower = u0_lower;
+
+out.u1.mu = u1_mu;
+out.u1.sigma = u1_sigma;
+out.u1.upper = u1_upper;
+out.u1.lower = u1_lower;
 
 %% Rho statistics (only if requested)
 if includeRho
@@ -116,6 +191,26 @@ out.q0.fillY = [out.q0.upper; flipud(out.q0.lower)];
 % q1 fill
 out.q1.fillX = [t; flipud(t)];
 out.q1.fillY = [out.q1.upper; flipud(out.q1.lower)];
+
+%% Store fill() data for dq0 and dq1 (for external plotting)
+
+% dq0 fill
+out.dq0.fillX = [t; flipud(t)];
+out.dq0.fillY = [out.dq0.upper; flipud(out.dq0.lower)];
+
+% dq1 fill
+out.dq1.fillX = [t; flipud(t)];
+out.dq1.fillY = [out.dq1.upper; flipud(out.dq1.lower)];
+
+%% Store fill() data for u0 and u1 (for external plotting)
+
+% u0 fill
+out.u0.fillX = [t; flipud(t)];
+out.u0.fillY = [out.u0.upper; flipud(out.u0.lower)];
+
+% u1 fill
+out.u1.fillX = [t; flipud(t)];
+out.u1.fillY = [out.u1.upper; flipud(out.u1.lower)];
 
 %% Store reference
 out.reference.q = q_ref(1:endpoint,:);
