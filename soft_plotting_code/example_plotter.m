@@ -252,8 +252,6 @@ TnRHigh = ezloopdata_safetyplotter(smooth_q_cells, time_cells, time_TnR4, smooth
 
 %% Example Plotting code used for Robosoft poster
 %%%%%%%%%%%%%%%%%%%
-single_column = true;
-picturewidth_singlecolumn = 8.9 ; % cm
 
 sim_calib_data = load('callibration_data.mat');
 sim_time = sim_calib_data.export_data(:,1);
@@ -268,46 +266,33 @@ sim_q2 = deg2rad(sim_q2);
 sim_q1_inter = deg2rad(sim_q1_inter);
 sim_q2_inter = deg2rad(sim_q2_inter);
 
-sim_plot = figure;
+axisFont   = 10;
+labelFont  = 12;
+legendFont = 10;
 
-% subplot(2,1,1)
-% p_r1 = plot(sim_time, smooth_q_cal(2:end,1), '-.', 'Color', [0.2 0.2 0.2], 'LineWidth', 2); hold on
-% p1 = plot(sim_time, sim_q1_inter, 'Color', [0 0.4470 0.7410], 'LineWidth', 1.5);
-% 
-% xlabel('Time (s)','FontSize',15)
-% ylabel('$q_1$ (radians)','FontSize',15)
-% lgd = legend([p1, p_r1], {'Calibrated Simulation','Reference Data'}, 'Location','best','FontSize',12);
-% xlim([0 sim_time(end)])
-% ax = gca;
-% ax.FontSize = 14;
-% grid on;
-% hold off
-% 
-% subplot(2,1,2)
-% p_r1 = plot(sim_time, smooth_q_cal(2:end,2), '-.', 'Color', [0.2 0.2 0.2], 'LineWidth', 2); hold on
-% p1 = plot(sim_time, sim_q2_inter, 'Color', [0 0.4470 0.7410], 'LineWidth', 1.5);
-% 
-% xlabel('Time (s)','FontSize',15)
-% ylabel('$q_2$ (radians)','FontSize',15)
-% ax = gca;
-% ax.FontSize = 14;
-% grid on;
-% hold off
+picturewidth_singlecolumn = 8.9;   % cm, typical single-column width
+hw_ratio = 1.4;                    % height / width for 6 stacked plots
+
+sim_plot = figure('Units','centimeters', ...
+    'Position',[2.3 1 picturewidth_singlecolumn hw_ratio*picturewidth_singlecolumn]);
+
+t = tiledlayout(sim_plot,2,1, ...
+    'TileSpacing','compact', ...
+    'Padding','compact');
+
+xLimits = [0 sim_time(end)];
 
 % Plot 1
-t = tiledlayout(2,1,...
-    'TileSpacing','compact',...
-    'Padding','compact');
 ax1 = nexttile;
 p_r1 = plot(sim_time, smooth_q_cal(2:end,1), '-.', 'Color', [0.2 0.2 0.2], 'LineWidth', 2); hold on
 p1 = plot(sim_time, sim_q1_inter, 'Color', [0 0.4470 0.7410], 'LineWidth', 1.5);
 
-% xlabel('Time (s)','FontSize',12)
-ylabel('$q_1$ (rad)','FontSize',12)
-lgd = legend([p1, p_r1], {'Calibrated Simulation','Reference Data'}, 'Location','best','FontSize',12);
+ylabel('$q_1$ (rad)','FontSize',labelFont)
+grid on
+hold off
+
+lgd = legend([p1, p_r1], {'Sim.','Ref.'}, 'Numcolumns',2,'Location','northeast','FontSize',legendFont);
 xlim([0 sim_time(end)])
-ax = gca;
-ax.FontSize = 14;
 grid on;
 hold off
 
@@ -318,20 +303,22 @@ p1 = plot(sim_time, sim_q2_inter, 'Color', [0 0.4470 0.7410], 'LineWidth', 1.5);
 
 xlabel('Time (s)','FontSize',12)
 ylabel('$q_2$ (rad)','FontSize',12)
-ax = gca;
-ax.FontSize = 14;
 grid on;
 hold off
 
-hw_ratio = 0.7;
+set([ax1 ax2], ...
+    'FontSize',axisFont, ...
+    'XLim',xLimits, ...
+    'Box','off', ...
+    'TickLabelInterpreter','latex');
+
+ax1.XTickLabel = [];
+
+linkaxes([ax1 ax2],'x')
 
 set(findall(sim_plot,'-property','Interpreter'), 'Interpreter', 'latex')
 set(findall(sim_plot,'-property','TickLabelInterpreter'), 'TickLabelInterpreter', 'latex')
 set(findall(sim_plot,'-property','Box'), 'Box', 'off')
-set(sim_plot, 'Units', 'centimeters', ...
-        'Position', [2.3 1 picturewidth_singlecolumn hw_ratio * picturewidth_singlecolumn]);
-xlim([0 sim_time(end)])
-grid on;
 
 fname = 'fin_plots/SimTuning';
 exportgraphics(sim_plot, strcat(fname, '.pdf'), 'ContentType', 'vector');
@@ -416,8 +403,25 @@ grid on;
 fname = 'fin_plots/Rho_Comparison';
 exportgraphics(rho_plot, strcat(fname, '.pdf'), 'ContentType', 'vector');
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% force plot
-force_plot = figure;
+%%%%%%%%%%%%%% force plot
+
+axisFont   = 10;
+labelFont  = 12;
+legendFont = 10;
+
+picturewidth_singlecolumn = 8.9;   % cm, typical single-column width
+hw_ratio = 1.4;                    % height / width for 6 stacked plots
+
+force_plot = figure('Units','centimeters', ...
+    'Position',[2.3 1 picturewidth_singlecolumn hw_ratio*picturewidth_singlecolumn]);
+
+t = tiledlayout(force_plot,1,1, ...
+    'TileSpacing','compact', ...
+    'Padding','compact');
+
+xLimits = [0 out1.time(end)];
+
+ax1 = nexttile;
 fill(out1.force.fillX, out1.force.fillY, [0 0.447 0.741], ...
     'EdgeColor', 'none', 'FaceAlpha', 0.15);
 hold on
@@ -429,27 +433,43 @@ p1 = plot(out1.time, out1.force.mu, 'Color', [0 0.447 0.741], 'LineWidth', 1.5);
 p2 = plot(out2.time, out2.force.mu, 'Color', [0.850 0.325 0.098], 'LineWidth', 1.5);
 p3 = plot(out1.time, F_max, '--r', 'LineWidth', 1.5);
 
-ylabel('Force ($N$)','FontSize',15);xlabel('Time ($s$)','FontSize',15)
-lgd = legend([p1,p2,p3],{'CD','CBF','Max Force'},'Location','best','FontSize',12);
-ax = gca;
-ax.FontSize = 14;
-
+ylabel('Force ($N$)','FontSize',15);xlabel('Time ($s$)','FontSize',labelFont)
+lgd = legend([p1,p2,p3], {'CD','CBF','Max Force'}, 'Numcolumns',2,'Location','northeast','FontSize',legendFont,'Box','off');
+grid on;
 hold off
 
-hw_ratio = 1.1;
+set(ax1, ...
+    'FontSize',axisFont, ...
+    'XLim',xLimits, ...
+    'Box','off', ...
+    'TickLabelInterpreter','latex');
 
-set(findall(force_plot,'-property','Interpreter'), 'Interpreter', 'latex')
-set(findall(force_plot,'-property','TickLabelInterpreter'), 'TickLabelInterpreter', 'latex')
-set(findall(force_plot,'-property','Box'), 'Box', 'off')
-set(force_plot, 'Units', 'centimeters', ...
-        'Position', [2.3 1 picturewidth_singlecolumn hw_ratio * picturewidth_singlecolumn]);
-grid on;
+set(findall(force_plot,'-property','Interpreter'), ...
+    'Interpreter','latex')
 
 fname = 'fin_plots/Force_Comparison';
-exportgraphics(force_plot, strcat(fname, '.png'), 'ContentType', 'vector');
+exportgraphics(force_plot, strcat(fname, '.pdf'), 'ContentType', 'vector');
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% force plot, just CD
-forceCD_plot = figure;
+%% force plot, just CD
+
+axisFont   = 10;
+labelFont  = 12;
+legendFont = 10;
+
+picturewidth_singlecolumn = 8.9;   % cm, typical single-column width
+hw_ratio = 1.4;                    % height / width for 6 stacked plots
+
+forceCD_plot = figure('Units','centimeters', ...
+    'Position',[2.3 1 picturewidth_singlecolumn hw_ratio*picturewidth_singlecolumn]);
+
+t = tiledlayout(forceCD_plot,1,1, ...
+    'TileSpacing','compact', ...
+    'Padding','compact');
+
+xLimits = [0 out1.time(end)];
+
+% Plot 1
+ax1 = nexttile;
 fill(out1.force.fillX, out1.force.fillY, [0 0.447 0.741], ...
     'EdgeColor', 'none', 'FaceAlpha', 0.15);
 hold on
@@ -457,26 +477,24 @@ hold on
 p1 = plot(out1.time, out1.force.mu, 'Color', [0 0.447 0.741], 'LineWidth', 1.5);
 p3 = plot(out1.time, F_max, '--r', 'LineWidth', 1.5);
 
-ylabel('Force ($N$)','FontSize',15);xlabel('Time ($s$)','FontSize',15)
-lgd = legend([p1,p3],{'CD','Max Force'},'Location','best','FontSize',12);
-ax = gca;
-ax.FontSize = 14;
-
+ylabel('Force ($N$)','FontSize',15);xlabel('Time ($s$)','FontSize',labelFont)
+lgd = legend([p1,p3], {'CD','Max Force'}, 'Numcolumns',2,'Location','northeast','FontSize',legendFont,'Box','off');
+grid on;
 hold off
 
-hw_ratio = 1.1;
+set(ax1, ...
+    'FontSize',axisFont, ...
+    'XLim',xLimits, ...
+    'Box','off', ...
+    'TickLabelInterpreter','latex');
 
-set(findall(forceCD_plot,'-property','Interpreter'), 'Interpreter', 'latex')
-set(findall(forceCD_plot,'-property','TickLabelInterpreter'), 'TickLabelInterpreter', 'latex')
-set(findall(forceCD_plot,'-property','Box'), 'Box', 'off')
-set(forceCD_plot, 'Units', 'centimeters', ...
-        'Position', [2.3 1 picturewidth_singlecolumn hw_ratio * picturewidth_singlecolumn]);
-grid on;
+set(findall(forceCD_plot,'-property','Interpreter'), ...
+    'Interpreter','latex')
 
 fname = 'fin_plots/ForceCD_Comparison';
-exportgraphics(forceCD_plot, strcat(fname, '.png'), 'ContentType', 'vector');
+exportgraphics(forceCD_plot, strcat(fname, '.pdf'), 'ContentType', 'vector');
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% force plot, just CBF
+%% force plot, just CBF
 
 forceCBF_plot = figure;
 hold on
@@ -507,101 +525,269 @@ fname = 'fin_plots/ForceCBF_Comparison';
 exportgraphics(forceCBF_plot, strcat(fname, '.png'), 'ContentType', 'vector');
 
 %% comparison of q0 and q1 for CD vs CBF
-traj_plot = figure;
 
-subplot(2,1,1)
-fill(out1.q0.fillX, out1.q0.fillY, [0 0.4470 0.7410], 'FaceAlpha', 0.2, 'EdgeColor', 'none'); hold on
+axisFont   = 10;
+labelFont  = 12;
+legendFont = 10;
+
+picturewidth_singlecolumn = 8.9;   % cm, typical single-column width
+hw_ratio = 1.4;                    % height / width for 6 stacked plots
+
+traj_plot = figure('Units','centimeters', ...
+    'Position',[2.3 1 picturewidth_singlecolumn hw_ratio*picturewidth_singlecolumn]);
+
+t = tiledlayout(traj_plot,8,1, ...
+    'TileSpacing','compact', ...
+    'Padding','compact');
+
+xLimits = [0 out1.time_ref(end)];
+blue = [0 0.4470 0.7410];
+gray = [0.2 0.2 0.2];
+
+% Plot 1: q1
+ax1 = nexttile([2 1]);
+fill(out1.q0.fillX, out1.q0.fillY, blue, ...
+    'FaceAlpha',0.2,'EdgeColor','none'); 
+hold on
 fill(out2.q0.fillX, out2.q0.fillY, [0.8500 0.3250 0.0980], 'FaceAlpha', 0.2, 'EdgeColor', 'none');
-
-p_r1 = plot(out1.time_ref, out1.reference.q(:,1), '-.', 'Color', [0.2 0.2 0.2], 'LineWidth', 2);
-
-p1 = plot(out1.time, out1.q0.mu, 'Color', [0 0.4470 0.7410], 'LineWidth', 1.5);
+p_r1 = plot(out1.time_ref, out1.reference.q(:,1), '-.', ...
+    'Color',gray,'LineWidth',1.6);
+p1 = plot(out1.time, out1.q0.mu, ...
+    'Color',blue,'LineWidth',1.4);
 p2 = plot(out2.time, out2.q0.mu, 'Color', [0.8500 0.3250 0.0980], 'LineWidth', 1.5);
 
-xlabel('Time (s)','FontSize',15)
-ylabel('$q_1$ (radians)','FontSize',15)
-lgd = legend([p1, p2, p_r1], {'CD','CBF','Reference'}, 'Location','best','FontSize',12);
-ax = gca;
-ax.FontSize = 14;
-grid on;
+ylabel('$q_1$ (rad)','FontSize',labelFont)
+lgd = legend([p1,p2,p_r1], {'CD','CBF','Ref.'}, 'NumColumns',2, ...
+    'Location','northwest','FontSize',legendFont,'Box','off');
+
+lgd.Position = lgd.Position + [-0.01 0 0 0.04];
+
+grid on
 hold off
 
-subplot(2,1,2)
-fill(out1.q1.fillX, out1.q1.fillY, [0 0.4470 0.7410], 'FaceAlpha', 0.2, 'EdgeColor', 'none'); hold on
+% Plot 2: q2
+ax2 = nexttile([2 1]);
+fill(out1.q1.fillX, out1.q1.fillY, blue, ...
+    'FaceAlpha',0.2,'EdgeColor','none'); 
+hold on
 fill(out2.q1.fillX, out2.q1.fillY, [0.8500 0.3250 0.0980], 'FaceAlpha', 0.2, 'EdgeColor', 'none');
-
-p_r1 = plot(out1.time_ref, out1.reference.q(:,2), '-.', 'Color', [0.2 0.2 0.2], 'LineWidth', 2);
-
-p1 = plot(out1.time, out1.q1.mu, 'Color', [0 0.4470 0.7410], 'LineWidth', 1.5);
+p_r1 = plot(out1.time_ref, out1.reference.q(:,2), '-.', ...
+    'Color',gray,'LineWidth',1.6);
+p1 = plot(out1.time, out1.q1.mu, ...
+    'Color',blue,'LineWidth',1.4);
 p2 = plot(out2.time, out2.q1.mu, 'Color', [0.8500 0.3250 0.0980], 'LineWidth', 1.5);
 
-xlabel('Time ($s$)','FontSize',15)
-ylabel('$q_2$ (radians)','FontSize',15)
-ax = gca;
-ax.FontSize = 14;
+ylabel('$q_2$ (rad)','FontSize',labelFont)
+
+grid on
 hold off
 
-hw_ratio = 1.1;
+% Plot 3: dq1
+ax3 = nexttile;
+fill(out1.dq0.fillX, out1.dq0.fillY, blue, ...
+    'FaceAlpha',0.2,'EdgeColor','none'); 
+hold on
+fill(out2.dq0.fillX, out2.dq0.fillY, [0.8500 0.3250 0.0980], 'FaceAlpha', 0.2, 'EdgeColor', 'none');
+plot(out1.time, out1.dq0.mu, ...
+    'Color',blue,'LineWidth',1.2);
+plot(out2.time, out2.dq0.mu, 'Color', [0.8500 0.3250 0.0980], 'LineWidth', 1.5);
 
-set(findall(traj_plot,'-property','Interpreter'), 'Interpreter', 'latex')
-set(findall(traj_plot,'-property','TickLabelInterpreter'), 'TickLabelInterpreter', 'latex')
-set(findall(traj_plot,'-property','Box'), 'Box', 'off')
-set(traj_plot, 'Units', 'centimeters', ...
-        'Position', [2.3 1 picturewidth_singlecolumn hw_ratio * picturewidth_singlecolumn]);
-grid on;
+ylabel('$\dot{q}_1$','FontSize',labelFont)
+grid on
+hold off
+
+% Plot 4: dq2
+ax4 = nexttile;
+fill(out1.dq1.fillX, out1.dq1.fillY, blue, ...
+    'FaceAlpha',0.2,'EdgeColor','none'); 
+hold on
+fill(out2.dq1.fillX, out2.dq1.fillY, [0.8500 0.3250 0.0980], 'FaceAlpha', 0.2, 'EdgeColor', 'none');
+plot(out1.time, out1.dq1.mu, ...
+    'Color',blue,'LineWidth',1.2);
+plot(out2.time, out2.dq1.mu, 'Color', [0.8500 0.3250 0.0980], 'LineWidth', 1.5);
+ylabel('$\dot{q}_2$','FontSize',labelFont)
+grid on
+hold off
+
+% Plot 5: u1
+ax5 = nexttile;
+fill(out1.u0.fillX, out1.u0.fillY, blue, ...
+    'FaceAlpha',0.2,'EdgeColor','none'); 
+hold on
+fill(out2.u0.fillX, out2.u0.fillY, [0.8500 0.3250 0.0980], 'FaceAlpha', 0.2, 'EdgeColor', 'none');
+plot(out1.time, out1.u0.mu, ...
+    'Color',blue,'LineWidth',1.2);
+plot(out2.time, out2.u0.mu, 'Color', [0.8500 0.3250 0.0980], 'LineWidth', 1.5);
+
+ylabel('$u_1$','FontSize',labelFont)
+grid on
+hold off
+
+% Plot 6: u2
+ax6 = nexttile;
+fill(out1.u1.fillX, out1.u1.fillY, blue, ...
+    'FaceAlpha',0.2,'EdgeColor','none'); 
+hold on
+fill(out2.u1.fillX, out2.u1.fillY, [0.8500 0.3250 0.0980], 'FaceAlpha', 0.2, 'EdgeColor', 'none');
+plot(out1.time, out1.u1.mu, ...
+    'Color',blue,'LineWidth',1.2);
+plot(out2.time, out2.u1.mu, 'Color', [0.8500 0.3250 0.0980], 'LineWidth', 1.5);
+
+xlabel('Time (s)','FontSize',labelFont)
+ylabel('$u_2$','FontSize',labelFont)
+grid on
+hold off
+
+set([ax1 ax2 ax3 ax4 ax5 ax6], ...
+    'FontSize',axisFont, ...
+    'XLim',xLimits, ...
+    'Box','off', ...
+    'TickLabelInterpreter','latex');
+
+ax1.XTickLabel = [];
+ax1.YTick = [-0.5 0 0.9];
+ax2.XTickLabel = [];
+ax3.XTickLabel = [];
+ax4.XTickLabel = [];
+ax4.YTick = [-0.4 0 0.6];
+ax5.XTickLabel = [];
+ax5.YLim = [-120 140];
+ax5.YTick = [-120 0 140];
+ax6.YTick = [-120 0 200];
+
+linkaxes([ax1 ax2 ax3 ax4 ax5 ax6],'x')
+
+set(findall(traj_plot,'-property','Interpreter'), ...
+    'Interpreter','latex')
 
 fname = 'fin_plots/TrajectoryTracking_Comparison';
-exportgraphics(traj_plot, strcat(fname, '.png'), 'ContentType', 'vector');
+exportgraphics(traj_plot, strcat(fname, '.pdf'), 'ContentType', 'vector');
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Tracking CD
+%% Tracking CD
 
-trajCD_plot = figure;
+axisFont   = 10;
+labelFont  = 12;
+legendFont = 10;
 
-subplot(2,1,1)
-fill(out1.q0.fillX, out1.q0.fillY, [0 0.4470 0.7410], 'FaceAlpha', 0.2, 'EdgeColor', 'none'); hold on
+picturewidth_singlecolumn = 8.9;   % cm, typical single-column width
+hw_ratio = 1.4;                    % height / width for 6 stacked plots
 
-p_r1 = plot(out1.time_ref, out1.reference.q(:,1), '-.', 'Color', [0.2 0.2 0.2], 'LineWidth', 2);
+trajCD_plot = figure('Units','centimeters', ...
+    'Position',[2.3 1 picturewidth_singlecolumn hw_ratio*picturewidth_singlecolumn]);
 
-p1 = plot(out1.time, out1.q0.mu, 'Color', [0 0.4470 0.7410], 'LineWidth', 1.5);
+t = tiledlayout(trajCD_plot,8,1, ...
+    'TileSpacing','compact', ...
+    'Padding','compact');
 
-xlabel('Time (s)','FontSize',15)
-ylabel('$q_1$ (radians)','FontSize',15)
-lgd = legend([p1, p_r1], {'CD','Reference'}, 'Location','best','FontSize',12);
-ax = gca;
-ax.FontSize = 14;
-grid on;
+xLimits = [0 out1.time_ref(end)];
+blue = [0 0.4470 0.7410];
+gray = [0.2 0.2 0.2];
+
+% Plot 1: q1
+ax1 = nexttile([2 1]);
+fill(out1.q0.fillX, out1.q0.fillY, blue, ...
+    'FaceAlpha',0.2,'EdgeColor','none'); 
+hold on
+p_r1 = plot(out1.time_ref, out1.reference.q(:,1), '-.', ...
+    'Color',gray,'LineWidth',1.6);
+p1 = plot(out1.time, out1.q0.mu, ...
+    'Color',blue,'LineWidth',1.4);
+
+ylabel('$q_1$ (rad)','FontSize',labelFont)
+lgd = legend([p1, p_r1], {'CD','Ref.'}, 'NumColumns',2, ...
+    'Location','northwest','FontSize',legendFont,'Box','off');
+
+lgd.Position = lgd.Position + [-0.01 0 0 0.04];
+
+grid on
 hold off
 
-subplot(2,1,2)
-fill(out1.q1.fillX, out1.q1.fillY, [0 0.4470 0.7410], 'FaceAlpha', 0.2, 'EdgeColor', 'none'); hold on
+% Plot 2: q2
+ax2 = nexttile([2 1]);
+fill(out1.q1.fillX, out1.q1.fillY, blue, ...
+    'FaceAlpha',0.2,'EdgeColor','none'); 
+hold on
+plot(out1.time_ref, out1.reference.q(:,2), '-.', ...
+    'Color',gray,'LineWidth',1.6);
+plot(out1.time, out1.q1.mu, ...
+    'Color',blue,'LineWidth',1.4);
 
-p_r1 = plot(out1.time_ref, out1.reference.q(:,2), '-.', 'Color', [0.2 0.2 0.2], 'LineWidth', 2);
-
-p1 = plot(out1.time, out1.q1.mu, 'Color', [0 0.4470 0.7410], 'LineWidth', 1.5);
-
-xlabel('Time ($s$)','FontSize',15)
-ylabel('$q_2$ (radians)','FontSize',15)
-ax = gca;
-ax.FontSize = 14;
+ylabel('$q_2$ (rad)','FontSize',labelFont)
+grid on
 hold off
 
-% lgd.Units = 'normalized';       % Make position relative to axes
-% pos1 = lgd.Position;
-% pos1(1) = pos1(1) - 0;         % Move right
-% pos1(2) = pos1(2) + 0;         % Move up
-% lgd.Position = pos1;
+% Plot 3: dq1
+ax3 = nexttile;
+fill(out1.dq0.fillX, out1.dq0.fillY, blue, ...
+    'FaceAlpha',0.2,'EdgeColor','none'); 
+hold on
+plot(out1.time, out1.dq0.mu, ...
+    'Color',blue,'LineWidth',1.2);
 
-hw_ratio = 1.1;
+ylabel('$\dot{q}_1$','FontSize',labelFont)
+grid on
+hold off
 
-set(findall(trajCD_plot,'-property','Interpreter'), 'Interpreter', 'latex')
-set(findall(trajCD_plot,'-property','TickLabelInterpreter'), 'TickLabelInterpreter', 'latex')
-set(findall(trajCD_plot,'-property','Box'), 'Box', 'off')
-set(trajCD_plot, 'Units', 'centimeters', ...
-        'Position', [2.3 1 picturewidth_singlecolumn hw_ratio * picturewidth_singlecolumn]);
-grid on;
+% Plot 4: dq2
+ax4 = nexttile;
+fill(out1.dq1.fillX, out1.dq1.fillY, blue, ...
+    'FaceAlpha',0.2,'EdgeColor','none'); 
+hold on
+plot(out1.time, out1.dq1.mu, ...
+    'Color',blue,'LineWidth',1.2);
+
+ylabel('$\dot{q}_2$','FontSize',labelFont)
+grid on
+hold off
+
+% Plot 5: u1
+ax5 = nexttile;
+fill(out1.u0.fillX, out1.u0.fillY, blue, ...
+    'FaceAlpha',0.2,'EdgeColor','none'); 
+hold on
+plot(out1.time, out1.u0.mu, ...
+    'Color',blue,'LineWidth',1.2);
+
+ylabel('$u_1$','FontSize',labelFont)
+grid on
+hold off
+
+% Plot 6: u2
+ax6 = nexttile;
+fill(out1.u1.fillX, out1.u1.fillY, blue, ...
+    'FaceAlpha',0.2,'EdgeColor','none'); 
+hold on
+plot(out1.time, out1.u1.mu, ...
+    'Color',blue,'LineWidth',1.2);
+
+xlabel('Time (s)','FontSize',labelFont)
+ylabel('$u_2$','FontSize',labelFont)
+grid on
+hold off
+
+set([ax1 ax2 ax3 ax4 ax5 ax6], ...
+    'FontSize',axisFont, ...
+    'XLim',xLimits, ...
+    'Box','off', ...
+    'TickLabelInterpreter','latex');
+
+ax1.XTickLabel = [];
+ax1.YTick = [-0.5 0 0.9];
+ax2.XTickLabel = [];
+ax3.XTickLabel = [];
+ax3.YTick = [-0.11 0 0.12];
+ax4.XTickLabel = [];
+ax4.YTick = [-0.3 0 0.4];
+ax5.XTickLabel = [];
+ax6.YTick = [-120 0 200];
+
+linkaxes([ax1 ax2 ax3 ax4 ax5 ax6],'x')
+
+set(findall(trajCD_plot,'-property','Interpreter'), ...
+    'Interpreter','latex')
 
 fname = 'fin_plots/CDTrackingFP';
-exportgraphics(trajCD_plot, strcat(fname, '.png'), 'ContentType', 'vector');
+exportgraphics(trajCD_plot, strcat(fname, '.pdf'), 'ContentType', 'vector');
 
 %% PD tuning results
 
@@ -634,10 +820,10 @@ p1 = plot(TunePD.time, TunePD.q0.mu, ...
     'Color',blue,'LineWidth',1.4);
 
 ylabel('$q_1$ (rad)','FontSize',labelFont)
-lgd = legend([p1, p_r1], {'PD','Reference'}, ...
+lgd = legend([p1, p_r1], {'PD','Ref.'}, 'NumColumns',2, ...
     'Location','northeast','FontSize',legendFont,'Box','off');
 
-lgd.Position = lgd.Position + [0.04 0 0 0.06];
+lgd.Position = lgd.Position + [0.04 0 0 0.04];
 
 grid on
 hold off
@@ -728,132 +914,355 @@ exportgraphics(pdtuning_plot, strcat(fname, '.pdf'), ...
 
 %% PD tracking results
 
-pdtracking_plot = figure;
+pdtracking_plot = figure('Units','centimeters', ...
+    'Position',[2.3 1 picturewidth_singlecolumn hw_ratio*picturewidth_singlecolumn]);
 
-subplot(2,1,1)
-fill(CalibPD.q0.fillX, CalibPD.q0.fillY, [0 0.4470 0.7410], 'FaceAlpha', 0.2, 'EdgeColor', 'none'); hold on
-p_r1 = plot(CalibPD.time_ref, CalibPD.reference.q(:,1), '-.', 'Color', [0.2 0.2 0.2], 'LineWidth', 2);
-p1 = plot(CalibPD.time, CalibPD.q0.mu, 'Color', [0 0.4470 0.7410], 'LineWidth', 1.5);
+t = tiledlayout(pdtracking_plot,8,1, ...
+    'TileSpacing','compact', ...
+    'Padding','compact');
 
-xlabel('Time (s)','FontSize',15)
-ylabel('$q_1$ (radians)','FontSize',15)
-lgd = legend([p1, p_r1], {'PD','Reference'}, 'Location','best','FontSize',12);
-xlim([0 CalibPD.time_ref(end)])
-ax = gca;
-ax.FontSize = 14;
-grid on;
+xLimits = [0 CalibPD.time_ref(end)];
+blue = [0 0.4470 0.7410];
+gray = [0.2 0.2 0.2];
+
+% Plot 1: q1
+ax1 = nexttile([2 1]);
+fill(CalibPD.q0.fillX, CalibPD.q0.fillY, blue, ...
+    'FaceAlpha',0.2,'EdgeColor','none'); 
+hold on
+p_r1 = plot(CalibPD.time_ref, CalibPD.reference.q(:,1), '-.', ...
+    'Color',gray,'LineWidth',1.6);
+p1 = plot(CalibPD.time, CalibPD.q0.mu, ...
+    'Color',blue,'LineWidth',1.4);
+
+ylabel('$q_1$ (rad)','FontSize',labelFont)
+lgd = legend([p1, p_r1], {'PD','Ref.'}, 'NumColumns',2, ...
+    'Location','northeast','FontSize',legendFont,'Box','off');
+
+lgd.Position = lgd.Position + [0.04 0 0 0.04];
+
+grid on
 hold off
 
-subplot(2,1,2)
-fill(CalibPD.q1.fillX, CalibPD.q1.fillY, [0 0.4470 0.7410], 'FaceAlpha', 0.2, 'EdgeColor', 'none'); hold on
-p_r1 = plot(CalibPD.time_ref, CalibPD.reference.q(:,2), '-.', 'Color', [0.2 0.2 0.2], 'LineWidth', 2);
-p1 = plot(CalibPD.time, CalibPD.q1.mu, 'Color', [0 0.4470 0.7410], 'LineWidth', 1.5);
+% Plot 2: q2
+ax2 = nexttile([2 1]);
+fill(CalibPD.q1.fillX, CalibPD.q1.fillY, blue, ...
+    'FaceAlpha',0.2,'EdgeColor','none'); 
+hold on
+plot(CalibPD.time_ref, CalibPD.reference.q(:,2), '-.', ...
+    'Color',gray,'LineWidth',1.6);
+plot(CalibPD.time, CalibPD.q1.mu, ...
+    'Color',blue,'LineWidth',1.4);
 
-xlabel('Time (s)','FontSize',15)
-ylabel('$q_2$ (radians)','FontSize',15)
-ax = gca;
-ax.FontSize = 14;
-grid on;
+ylabel('$q_2$ (rad)','FontSize',labelFont)
+grid on
 hold off
 
-hw_ratio = 1.1;
+% Plot 3: dq1
+ax3 = nexttile;
+fill(CalibPD.dq0.fillX, CalibPD.dq0.fillY, blue, ...
+    'FaceAlpha',0.2,'EdgeColor','none'); 
+hold on
+plot(CalibPD.time, CalibPD.dq0.mu, ...
+    'Color',blue,'LineWidth',1.2);
 
-set(findall(pdtracking_plot,'-property','Interpreter'), 'Interpreter', 'latex')
-set(findall(pdtracking_plot,'-property','TickLabelInterpreter'), 'TickLabelInterpreter', 'latex')
-set(findall(pdtracking_plot,'-property','Box'), 'Box', 'off')
-set(pdtracking_plot, 'Units', 'centimeters', ...
-        'Position', [2.3 1 picturewidth_singlecolumn hw_ratio * picturewidth_singlecolumn]);
-xlim([0 CalibPD.time_ref(end)])
-grid on;
+ylabel('$\dot{q}_1$','FontSize',labelFont)
+grid on
+hold off
+
+% Plot 4: dq2
+ax4 = nexttile;
+fill(CalibPD.dq1.fillX, CalibPD.dq1.fillY, blue, ...
+    'FaceAlpha',0.2,'EdgeColor','none'); 
+hold on
+plot(CalibPD.time, CalibPD.dq1.mu, ...
+    'Color',blue,'LineWidth',1.2);
+
+ylabel('$\dot{q}_2$','FontSize',labelFont)
+grid on
+hold off
+
+% Plot 5: u1
+ax5 = nexttile;
+fill(CalibPD.u0.fillX, CalibPD.u0.fillY, blue, ...
+    'FaceAlpha',0.2,'EdgeColor','none'); 
+hold on
+plot(CalibPD.time, CalibPD.u0.mu, ...
+    'Color',blue,'LineWidth',1.2);
+
+ylabel('$u_1$','FontSize',labelFont)
+grid on
+hold off
+
+% Plot 6: u2
+ax6 = nexttile;
+fill(CalibPD.u1.fillX, CalibPD.u1.fillY, blue, ...
+    'FaceAlpha',0.2,'EdgeColor','none'); 
+hold on
+plot(CalibPD.time, CalibPD.u1.mu, ...
+    'Color',blue,'LineWidth',1.2);
+
+xlabel('Time (s)','FontSize',labelFont)
+ylabel('$u_2$','FontSize',labelFont)
+grid on
+hold off
+
+set([ax1 ax2 ax3 ax4 ax5 ax6], ...
+    'FontSize',axisFont, ...
+    'XLim',xLimits, ...
+    'Box','off', ...
+    'TickLabelInterpreter','latex');
+
+ax1.XTickLabel = [];
+ax2.XTickLabel = [];
+ax3.XTickLabel = [];
+ax4.XTickLabel = [];
+ax5.XTickLabel = [];
+ax5.YTick = [-60 0 50];
+
+linkaxes([ax1 ax2 ax3 ax4 ax5 ax6],'x')
+
+set(findall(pdtracking_plot,'-property','Interpreter'), ...
+    'Interpreter','latex')
 
 fname = 'fin_plots/PDTracking';
-exportgraphics(pdtracking_plot, strcat(fname, '.png'), 'ContentType', 'vector');
+exportgraphics(pdtracking_plot, strcat(fname, '.pdf'), 'ContentType', 'vector');
 
 %% CD Tracking results 
 
-cdtracking_plot = figure;
+cdtracking_plot = figure('Units','centimeters', ...
+    'Position',[2.3 1 picturewidth_singlecolumn hw_ratio*picturewidth_singlecolumn]);
 
-subplot(2,1,1)
-fill(CalibCD.q0.fillX, CalibCD.q0.fillY, [0 0.4470 0.7410], 'FaceAlpha', 0.2, 'EdgeColor', 'none'); hold on
-p_r1 = plot(CalibCD.time_ref, CalibCD.reference.q(:,1), '-.', 'Color', [0.2 0.2 0.2], 'LineWidth', 2);
-p1 = plot(CalibCD.time, CalibCD.q0.mu, 'Color', [0 0.4470 0.7410], 'LineWidth', 1.5);
+t = tiledlayout(cdtracking_plot,8,1, ...
+    'TileSpacing','compact', ...
+    'Padding','compact');
 
-xlabel('Time (s)','FontSize',15)
-ylabel('$q_1$ (radians)','FontSize',15)
-lgd = legend([p1, p_r1], {'CD','Reference'}, 'Location','best','FontSize',12);
-xlim([0 CalibCD.time_ref(end)])
-ax = gca;
-ax.FontSize = 14;
-grid on;
+xLimits = [0 CalibCD.time_ref(end)];
+blue = [0 0.4470 0.7410];
+gray = [0.2 0.2 0.2];
+
+% Plot 1: q1
+ax1 = nexttile([2 1]);
+fill(CalibCD.q0.fillX, CalibCD.q0.fillY, blue, ...
+    'FaceAlpha',0.2,'EdgeColor','none'); 
+hold on
+p_r1 = plot(CalibCD.time_ref, CalibCD.reference.q(:,1), '-.', ...
+    'Color',gray,'LineWidth',1.6);
+p1 = plot(CalibCD.time, CalibCD.q0.mu, ...
+    'Color',blue,'LineWidth',1.4);
+
+ylabel('$q_1$ (rad)','FontSize',labelFont)
+lgd = legend([p1, p_r1], {'CD','Ref.'}, 'NumColumns',2, ...
+    'Location','northeast','FontSize',legendFont,'Box','off');
+
+lgd.Position = lgd.Position + [0.04 0 0 0.04];
+
+grid on
 hold off
 
-subplot(2,1,2)
-fill(CalibCD.q1.fillX, CalibCD.q1.fillY, [0 0.4470 0.7410], 'FaceAlpha', 0.2, 'EdgeColor', 'none'); hold on
-p_r1 = plot(CalibCD.time_ref, CalibCD.reference.q(:,2), '-.', 'Color', [0.2 0.2 0.2], 'LineWidth', 2);
-p1 = plot(CalibCD.time, CalibCD.q1.mu, 'Color', [0 0.4470 0.7410], 'LineWidth', 1.5);
+% Plot 2: q2
+ax2 = nexttile([2 1]);
+fill(CalibCD.q1.fillX, CalibCD.q1.fillY, blue, ...
+    'FaceAlpha',0.2,'EdgeColor','none'); 
+hold on
+plot(CalibCD.time_ref, CalibCD.reference.q(:,2), '-.', ...
+    'Color',gray,'LineWidth',1.6);
+plot(CalibCD.time, CalibCD.q1.mu, ...
+    'Color',blue,'LineWidth',1.4);
 
-xlabel('Time (s)','FontSize',15)
-ylabel('$q_2$ (radians)','FontSize',15)
-ax = gca;
-ax.FontSize = 14;
-grid on;
+ylabel('$q_2$ (rad)','FontSize',labelFont)
+grid on
 hold off
 
-hw_ratio = 1.1;
+% Plot 3: dq1
+ax3 = nexttile;
+fill(CalibCD.dq0.fillX, CalibCD.dq0.fillY, blue, ...
+    'FaceAlpha',0.2,'EdgeColor','none'); 
+hold on
+plot(CalibCD.time, CalibCD.dq0.mu, ...
+    'Color',blue,'LineWidth',1.2);
 
-set(findall(cdtracking_plot,'-property','Interpreter'), 'Interpreter', 'latex')
-set(findall(cdtracking_plot,'-property','TickLabelInterpreter'), 'TickLabelInterpreter', 'latex')
-set(findall(cdtracking_plot,'-property','Box'), 'Box', 'off')
-set(cdtracking_plot, 'Units', 'centimeters', ...
-        'Position', [2.3 1 picturewidth_singlecolumn hw_ratio * picturewidth_singlecolumn]);
-xlim([0 CalibCD.time_ref(end)])
-grid on;
+ylabel('$\dot{q}_1$','FontSize',labelFont)
+grid on
+hold off
+
+% Plot 4: dq2
+ax4 = nexttile;
+fill(CalibCD.dq1.fillX, CalibCD.dq1.fillY, blue, ...
+    'FaceAlpha',0.2,'EdgeColor','none'); 
+hold on
+plot(CalibCD.time, CalibCD.dq1.mu, ...
+    'Color',blue,'LineWidth',1.2);
+
+ylabel('$\dot{q}_2$','FontSize',labelFont)
+grid on
+hold off
+
+% Plot 5: u1
+ax5 = nexttile;
+fill(CalibCD.u0.fillX, CalibCD.u0.fillY, blue, ...
+    'FaceAlpha',0.2,'EdgeColor','none'); 
+hold on
+plot(CalibCD.time, CalibCD.u0.mu, ...
+    'Color',blue,'LineWidth',1.2);
+
+ylabel('$u_1$','FontSize',labelFont)
+grid on
+hold off
+
+% Plot 6: u2
+ax6 = nexttile;
+fill(CalibCD.u1.fillX, CalibCD.u1.fillY, blue, ...
+    'FaceAlpha',0.2,'EdgeColor','none'); 
+hold on
+plot(CalibCD.time, CalibCD.u1.mu, ...
+    'Color',blue,'LineWidth',1.2);
+
+xlabel('Time (s)','FontSize',labelFont)
+ylabel('$u_2$','FontSize',labelFont)
+grid on
+hold off
+
+set([ax1 ax2 ax3 ax4 ax5 ax6], ...
+    'FontSize',axisFont, ...
+    'XLim',xLimits, ...
+    'Box','off', ...
+    'TickLabelInterpreter','latex');
+
+ax1.XTickLabel = [];
+ax2.XTickLabel = [];
+ax3.XTickLabel = [];
+ax4.XTickLabel = [];
+ax4.YTick = [-0.05 0 0.03];
+ax5.XTickLabel = [];
+ax6.YTick = [-100 0 80];
+
+linkaxes([ax1 ax2 ax3 ax4 ax5 ax6],'x')
+
+set(findall(cdtracking_plot,'-property','Interpreter'), ...
+    'Interpreter','latex')
 
 fname = 'fin_plots/CDTracking';
-exportgraphics(cdtracking_plot, strcat(fname, '.png'), 'ContentType', 'vector');
+exportgraphics(cdtracking_plot, strcat(fname, '.pdf'), 'ContentType', 'vector');
 
 %% CD tracking of TnR
 
-cdtnr_plot = figure;
+cdtnr_plot = figure('Units','centimeters', ...
+    'Position',[2.3 1 picturewidth_singlecolumn hw_ratio*picturewidth_singlecolumn]);
 
-subplot(2,1,1)
-fill(TnR.q0.fillX, TnR.q0.fillY, [0 0.4470 0.7410], 'FaceAlpha', 0.2, 'EdgeColor', 'none'); hold on
-p_r1 = plot(TnR.time_ref, TnR.reference.q(:,1), '-.', 'Color', [0.2 0.2 0.2], 'LineWidth', 2);
-p1 = plot(TnR.time, TnR.q0.mu, 'Color', [0 0.4470 0.7410], 'LineWidth', 1.5);
+t = tiledlayout(cdtnr_plot,8,1, ...
+    'TileSpacing','compact', ...
+    'Padding','compact');
 
-xlabel('Time (s)','FontSize',15)
-ylabel('$q_1$ (radians)','FontSize',15)
-lgd = legend([p1, p_r1], {'CD','Reference'}, 'Location','best','FontSize',12);
-ax = gca;
-ax.FontSize = 14;
-xlim([0 TnR.time_ref(end)])
-grid on;
+xLimits = [0 TnR.time_ref(end)];
+blue = [0 0.4470 0.7410];
+gray = [0.2 0.2 0.2];
+
+% Plot 1: q1
+ax1 = nexttile([2 1]);
+fill(TnR.q0.fillX, TnR.q0.fillY, blue, ...
+    'FaceAlpha',0.2,'EdgeColor','none'); 
+hold on
+p_r1 = plot(TnR.time_ref, TnR.reference.q(:,1), '-.', ...
+    'Color',gray,'LineWidth',1.6);
+p1 = plot(TnR.time, TnR.q0.mu, ...
+    'Color',blue,'LineWidth',1.4);
+
+ylabel('$q_1$ (rad)','FontSize',labelFont)
+lgd = legend([p1, p_r1], {'CD','Ref.'}, 'NumColumns',2, ...
+    'Location','northwest','FontSize',legendFont,'Box','off');
+
+lgd.Position = lgd.Position + [-0.01 0 0 0.04];
+
+grid on
 hold off
 
-subplot(2,1,2)
-fill(TnR.q1.fillX, TnR.q1.fillY, [0 0.4470 0.7410], 'FaceAlpha', 0.2, 'EdgeColor', 'none'); hold on
-p_r1 = plot(TnR.time_ref, TnR.reference.q(:,2), '-.', 'Color', [0.2 0.2 0.2], 'LineWidth', 2);
-p1 = plot(TnR.time, TnR.q1.mu, 'Color', [0 0.4470 0.7410], 'LineWidth', 1.5);
+% Plot 2: q2
+ax2 = nexttile([2 1]);
+fill(TnR.q1.fillX, TnR.q1.fillY, blue, ...
+    'FaceAlpha',0.2,'EdgeColor','none'); 
+hold on
+plot(TnR.time_ref, TnR.reference.q(:,2), '-.', ...
+    'Color',gray,'LineWidth',1.6);
+plot(TnR.time, TnR.q1.mu, ...
+    'Color',blue,'LineWidth',1.4);
 
-xlabel('Time (s)','FontSize',15)
-ylabel('$q_2$ (radians)','FontSize',15)
-ax = gca;
-ax.FontSize = 14;
-grid on;
+ylabel('$q_2$ (rad)','FontSize',labelFont)
+grid on
 hold off
 
-hw_ratio = 1.1;
+% Plot 3: dq1
+ax3 = nexttile;
+fill(TnR.dq0.fillX, TnR.dq0.fillY, blue, ...
+    'FaceAlpha',0.2,'EdgeColor','none'); 
+hold on
+plot(TnR.time, TnR.dq0.mu, ...
+    'Color',blue,'LineWidth',1.2);
 
-set(findall(cdtnr_plot,'-property','Interpreter'), 'Interpreter', 'latex')
-set(findall(cdtnr_plot,'-property','TickLabelInterpreter'), 'TickLabelInterpreter', 'latex')
-set(findall(cdtnr_plot,'-property','Box'), 'Box', 'off')
-set(cdtnr_plot, 'Units', 'centimeters', ...
-        'Position', [2.3 1 picturewidth_singlecolumn hw_ratio * picturewidth_singlecolumn]);
-xlim([0 TnR.time_ref(end)])
-grid on;
+ylabel('$\dot{q}_1$','FontSize',labelFont)
+grid on
+hold off
+
+% Plot 4: dq2
+ax4 = nexttile;
+fill(TnR.dq1.fillX, TnR.dq1.fillY, blue, ...
+    'FaceAlpha',0.2,'EdgeColor','none'); 
+hold on
+plot(TnR.time, TnR.dq1.mu, ...
+    'Color',blue,'LineWidth',1.2);
+
+ylabel('$\dot{q}_2$','FontSize',labelFont)
+grid on
+hold off
+
+% Plot 5: u1
+ax5 = nexttile;
+fill(TnR.u0.fillX, TnR.u0.fillY, blue, ...
+    'FaceAlpha',0.2,'EdgeColor','none'); 
+hold on
+plot(TnR.time, TnR.u0.mu, ...
+    'Color',blue,'LineWidth',1.2);
+
+ylabel('$u_1$','FontSize',labelFont)
+grid on
+hold off
+
+% Plot 6: u2
+ax6 = nexttile;
+fill(TnR.u1.fillX, TnR.u1.fillY, blue, ...
+    'FaceAlpha',0.2,'EdgeColor','none'); 
+hold on
+plot(TnR.time, TnR.u1.mu, ...
+    'Color',blue,'LineWidth',1.2);
+
+xlabel('Time (s)','FontSize',labelFont)
+ylabel('$u_2$','FontSize',labelFont)
+grid on
+hold off
+
+set([ax1 ax2 ax3 ax4 ax5 ax6], ...
+    'FontSize',axisFont, ...
+    'XLim',xLimits, ...
+    'Box','off', ...
+    'TickLabelInterpreter','latex');
+
+ax1.XTickLabel = [];
+ax2.XTickLabel = [];
+ax3.XTickLabel = [];
+ax3.YTick = [-0.15 0 0.25];
+ax4.XTickLabel = [];
+ax4.YTick = [-0.25 0 0.45];
+ax5.XTickLabel = [];
+ax5.YTick = [-120 0 200];
+ax6.YTick = [-120 0 200];
+
+linkaxes([ax1 ax2 ax3 ax4 ax5 ax6],'x')
+
+set(findall(cdtnr_plot,'-property','Interpreter'), ...
+    'Interpreter','latex')
 
 fname = 'fin_plots/CDTnRTracking';
-exportgraphics(cdtnr_plot, strcat(fname, '.png'), 'ContentType', 'vector');
+exportgraphics(cdtnr_plot, strcat(fname, '.pdf'), 'ContentType', 'vector');
 
 %% Results from Low level tunning, how close can we follow control input
 

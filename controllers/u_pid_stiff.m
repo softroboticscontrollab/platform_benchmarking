@@ -1,0 +1,57 @@
+function w = u_pid_stiff(x, c, t)
+% Simple PID controller for a 2-DOF soft manipulator
+%
+% Inputs:
+%   x = [q1; q2; dq1; dq2]
+%   c.Kp, c.Ki, c.Kd  (2x1 or scalar gains)
+%   c.q_des           (2x1 desired joint position)
+%   c.dt              (time step)
+%   t = current time (unused, but kept for interface consistency)
+
+% This controller should be used for one limb at a time, ie. only actuate
+% one limb
+
+Kp = 3;
+Ki = 0;
+
+base_offset = 0; % starting offset for internal pressure
+curr_lim  = 1; % which limb are we talking about
+
+if curr_lim == 1
+
+    u = [60;0];
+
+else
+    
+    u = [0;60];
+
+end
+
+q  = x(1:2);
+dq = x(3:4);
+
+persistent t_prev
+if isempty(t_prev)
+    t_prev = t;      % first call
+end
+
+dt = t - t_prev;     % elapsed time
+t_prev = t;          % store for next call
+
+
+persistent e_int
+if isempty(e_int)
+    e_int = 0;
+end
+
+e = c.p_des(curr_lim) - q(curr_lim);
+
+e_int = e_int + e * dt;
+
+v = [base_offset;base_offset];
+
+v(curr_lim) = Kp .* e + Ki .* e_int;
+
+w = [u;v];
+
+end
