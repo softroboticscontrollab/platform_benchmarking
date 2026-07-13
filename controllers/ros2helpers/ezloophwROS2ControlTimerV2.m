@@ -48,4 +48,5 @@ function ezloophwROS2ControlTimerV2(~, ~, handles)
         smoothed_ddq_msg.data = ddBendingVec'; % Placeholder for acceleration values
         send(handles.publishers.smoothed_ddq.pub, smoothed_ddq_msg);
     end
+
 end
