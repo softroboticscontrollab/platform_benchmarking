@@ -81,7 +81,7 @@ aE = 0.1; bE = 0.1; gam = 0.05;
 % Use for medium conservativeness aE = 2; bE = 2; gam = 0.05
 % Use for high conservativeness aE = 0.1; bE = 0.1; gam = 0.05
 
-p_des = [deg2rad(20); 0];  
+p_des = [0.3599; 0.2812];  
 
 c.k_env = k_env;
 c.F_max = F_max;

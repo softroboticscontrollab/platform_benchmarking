@@ -11,15 +11,12 @@ function w = u_pid_stiff(x, c, t)
 % This controller should be used for one limb at a time, ie. only actuate
 % one limb
 
-Kp = 3;
-Ki = 0;
-
 base_offset = 0; % starting offset for internal pressure
 curr_lim  = 1; % which limb are we talking about
 
 if curr_lim == 1
 
-    u = [60;0];
+    u = [60+10;0];
 
 else
     
@@ -44,14 +41,29 @@ if isempty(e_int)
     e_int = 0;
 end
 
-e = c.p_des(curr_lim) - q(curr_lim);
+err = c.p_des(curr_lim) - q(curr_lim);
 
-e_int = e_int + e * dt;
+e_int = e_int + err * dt;
 
-v = [base_offset;base_offset];
+v = [base_offset+10;base_offset];
 
-%v(curr_lim) = Kp .* e + Ki .* e_int;
+% v(1) = Kp .* err + Ki .* e_int
 
-w = [u;v];
+persistent previous_input
+if isempty(previous_input)
+    previous_input = v(1);
+end
+
+if err > 0.01
+    v(1) = previous_input-0.1;
+elseif err < -0.01
+    v(1) = previous_input+0.1;
+else
+    v(1) = previous_input;
+end 
+
+previous_input = v(1);
+
+w = [u;abs(v)];
 
 end
