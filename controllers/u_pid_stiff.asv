@@ -12,40 +12,25 @@ function w = u_pid_stiff(x, c, t)
 % one limb
 
 base_offset = 0; % starting offset for internal pressure
+% Negative values for base offsets -10,-20 ..
+% Start from 0 to get initial q values
 curr_lim  = 1; % which limb are we talking about
 
 if curr_lim == 1
 
-    u = [60+10;0];
+    u = [-60+base_offset;0]; % -60 for left side
+    v = [base_offset;0];
 
 else
     
-    u = [0;60];
+    u = [0;-60+base_offset]; %-60 for left side
+    v = [0;base_offset];
 
 end
 
 q  = x(1:2);
-dq = x(3:4);
-
-persistent t_prev
-if isempty(t_prev)
-    t_prev = t;      % first call
-end
-
-dt = t - t_prev;     % elapsed time
-t_prev = t;          % store for next call
-
-
-persistent e_int
-if isempty(e_int)
-    e_int = 0;
-end
 
 err = c.p_des(curr_lim) - q(curr_lim);
-
-e_int = e_int + err * dt;
-
-v = [base_offset+10;base_offset];
 
 % v(1) = Kp .* err + Ki .* e_int
 
@@ -55,15 +40,15 @@ if isempty(previous_input)
 end
 
 if err > 0.01
-    v(1) = previous_input-0.1;
+    v(curr_lim) = previous_input-0.1;
 elseif err < -0.01
-    v(1) = previous_input+0.1;
+    v(curr_lim) = previous_input+0.1;
 else
-    v(1) = previous_input;
+    v(curr_lim) = previous_input;
 end 
 
-previous_input = v(1);
-
+previous_input = v(curr_lim);
+% Put v = [0;0]; % Chris addition to influ
 w = [u;abs(v)];
 
 end
