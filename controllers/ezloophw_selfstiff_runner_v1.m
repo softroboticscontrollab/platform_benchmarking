@@ -112,9 +112,11 @@ c.Kd_ct = Kd_ct;
 
 %% use this for calibration to common mode pressure - used for finding ratio of antagonistic pressures that result in no bending
 
-ctrlr = @u_pid_stiff;
+% ctrlr = @u_pid_stiff;
 
-% crtlt now is a 4x1 instead of a 2x1
+ctrlr = @u_v_static_sweep;
+
+% ctrlr now is a 4x1 instead of a 2x1
 
 %% Initialize ROS2 nodes for the MATLAB side
 % we are this node for sending control commands

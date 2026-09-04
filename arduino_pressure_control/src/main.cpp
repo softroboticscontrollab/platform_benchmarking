@@ -5,7 +5,7 @@
 #include "ABValve.h"
 #include "ProportionalValveController.h"
 
-// USE THIS FILE FOR STIFFENING, IF NOT DOING STIFFENING, THEN COPY NONSTIFF TO HERE
+// USE THIS FILE FOR STIFFENING, IF NOT DOING STIFFENING, THEN COPY NONSTIFF.cpp TO HERE
 // MAKE SURE TO CANGE THIS FILES NAME TO MAIN.CPP FOR CODE TO RUN
 
 // TODO: in proportional class, examine if the target pressure is beyond the bottle pressure. If so, warn and set to max.
