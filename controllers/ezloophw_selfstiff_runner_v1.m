@@ -114,7 +114,9 @@ c.Kd_ct = Kd_ct;
 
 % ctrlr = @u_pid_stiff;
 
-ctrlr = @u_v_static_sweep;
+% ctrlr = @u_v_static_sweep;
+
+ctrlr = @u_openloop_null;
 
 % ctrlr now is a 4x1 instead of a 2x1
 
