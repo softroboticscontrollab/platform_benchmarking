@@ -116,7 +116,11 @@ c.Kd_ct = Kd_ct;
 
 % ctrlr = @u_v_static_sweep;
 
-ctrlr = @u_openloop_null;
+ctrlr = @u_openloop_quad_calib;
+
+% ctrlr = @u_openloop_null;
+
+% ctrlr = @u_openloop_nullQM;
 
 % ctrlr now is a 4x1 instead of a 2x1
 
